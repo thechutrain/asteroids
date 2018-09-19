@@ -1,0 +1,18 @@
+// === RESET styles =====
+// @import 'base/reset';
+// @import 'base/normalize';
+// @import 'vendors/bootstrap/bootstrap-reboot';
+// TODO: split the critical styles out of modified-bootstrap/index :)
+// @import 'vendors/modified-bootstrap/index';
+
+// === include variables =====
+// @import 'base/variables';
+
+// === Typography =====
+// @import 'base/typography';
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}

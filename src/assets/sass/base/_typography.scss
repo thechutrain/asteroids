@@ -1,0 +1,20 @@
+@import '../vendors/poly-fluid-sizing';
+
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+@import url('https://fonts.googleapis.com/css?family=Permanent+Marker|Saira+Semi+Condensed');
+// @import url('https://fonts.googleapis.com/css?family=Aladin|Leckerli+One|Patrick+Hand|Patrick+Hand+SC|Rancho');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+body {
+	font-size: 24px;
+	font-family: 'Raleway';
+}
+
+.highlighted-text--green {
+	background-color: rgba(152, 202, 154, 0.5);
+}
+
+.highlighted-text--purple {
+	background-color: rgba(206, 147, 216, 0.8);
+}
