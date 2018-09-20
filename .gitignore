@@ -13,6 +13,6 @@ yarn-error.log
 
 
 #misc
-notes/**
+.notes/**
 .temp
 src/assets/sass/vendors/bootstrap/
