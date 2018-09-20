@@ -1,7 +1,11 @@
 'use strict';
 
 const utils = require('./utils');
-const initGame = require('./canvas');
+
+/**TODO: reorganize
+ * move documentEventListeners to the top, option to merge it
+ * add ability to pass in a cb function (readyFN) to registerDocumentEventListeners
+ */
 
 /** =========== Window related Event Listeners ===========
  *
@@ -39,9 +43,11 @@ const documentEventListeners = [
 	},
 ];
 
-function documentReadyCode() {
-	// Any additional functions that require the document with loaded content
-	initGame();
+function documentReadyCode(readyFn) {
+	// Run any code that requires the DOMContent to be loaded
+	if (typeof readyFn === 'function') {
+		readyFn();
+	}
 
 	// Register documentEventListeners here
 	documentEventListeners.forEach(listener => {
@@ -56,7 +62,8 @@ function documentReadyCode() {
 	});
 }
 
-function registerDocumentEventListeners() {
+//TODO: add flexibility of adding various cb fn as argument that will get invoked
+function registerDocumentEventListeners(readyFn) {
 	// IE9+ fix: http://youmightnotneedjquery.com/#ready
 	if (
 		// NOTE document.attachEvent --> for Opera & Internet Explorer below 9
@@ -64,14 +71,16 @@ function registerDocumentEventListeners() {
 			? document.readyState === 'complete'
 			: document.readyState !== 'loading'
 	) {
-		documentReadyCode();
+		documentReadyCode(readyFn);
 	} else {
-		document.addEventListener('DOMContentLoaded', documentReadyCode);
+		document.addEventListener('DOMContentLoaded', function() {
+			documentReadyCode(readyFn);
+		});
 	}
 }
 //#endregion
 
-module.exports = exports = function eventListeners() {
-	registerWindowEventListeners();
-	registerDocumentEventListeners();
+module.exports = {
+	registerWindowEventListeners,
+	registerDocumentEventListeners,
 };
