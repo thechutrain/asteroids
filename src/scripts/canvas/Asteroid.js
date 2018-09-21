@@ -5,7 +5,7 @@ const defaultOpts = {
 	animate: true,
 	translateX: -2,
 	translateY: -1,
-	spacer: 5, // additional padding space added when calculating off frame reset
+	spacer: 1, // additional padding space added when calculating off frame reset
 };
 
 function Asteroid(gameRef, options) {
@@ -15,14 +15,34 @@ function Asteroid(gameRef, options) {
 	this.ctx = gameRef.ctx; // reference to the context
 
 	this.points = [
-		{ x: 0, y: 0 },
-		{ x: 100, y: 0 },
-		{ x: 100, y: 50 },
-		{ x: 50, y: 100 },
-		{ x: 0, y: 0 },
+		{ x: 7, y: 0 },
+		{ x: 17, y: 0 },
+		{ x: 24, y: 7 },
+		{ x: 24, y: 17 },
+		{ x: 17, y: 24 },
+		{ x: 7, y: 24 },
+		{ x: 0, y: 17 },
+		{ x: 0, y: 7 },
 	];
 	this.onScreen = true; // when true, means at least one point is on the canvas
+
+	this.init();
 }
+
+Asteroid.prototype.init = function() {
+	// GENERATE RANDOM DIRECTION & SPEED
+	const xUpperSpeedBound = 3;
+	const xLowerSpeedBound = -2;
+	this.options.translateX = Math.floor(
+		Math.random() * (xUpperSpeedBound - xLowerSpeedBound) + xLowerSpeedBound
+	);
+
+	const yUpperSpeedBound = 1;
+	const yLowerSpeedBound = -3;
+	this.options.translateY = Math.floor(
+		Math.random() * (yUpperSpeedBound - yLowerSpeedBound) + yLowerSpeedBound
+	);
+};
 
 Asteroid.prototype.draw = function(ticks) {
 	const ctx = this.ctx;
