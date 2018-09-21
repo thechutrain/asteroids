@@ -5,12 +5,14 @@ const defaultOpts = {
 	animate: true,
 	translateX: -2,
 	translateY: -1,
+	spacer: 5, // additional padding space added when calculating off frame reset
 };
 
-function Asteroid(canvasElem, ctx, options) {
+function Asteroid(gameRef, options) {
+	// TODO: add ability to override deafault options
 	this.options = defaultOpts || {} || options;
-	this.canvasElem = canvasElem;
-	this.ctx = ctx; // reference to the context
+	this.canvasElem = gameRef.canvasElem;
+	this.ctx = gameRef.ctx; // reference to the context
 
 	this.points = [
 		{ x: 0, y: 0 },
@@ -101,7 +103,6 @@ Asteroid.prototype.isHidden = function() {
 Asteroid.prototype.reset = function reset() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
-	const spacer = 2;
 
 	let updatedX = false;
 	let updatedY = false;
@@ -118,8 +119,8 @@ Asteroid.prototype.reset = function reset() {
 		// Check to see if the trailing edge (far left x-coord on shape) is off screen
 		if (leftEdge > xLimit) {
 			// then adjust all the x-coordinates
-			// let adjustXBy = Math.ceil(leftEdge / xLimit) + spacer;
-			let adjustXBy = Math.ceil(rightEdge / xLimit) * xLimit + spacer;
+			let adjustXBy =
+				Math.ceil(rightEdge / xLimit) * xLimit + this.options.spacer;
 			this.points.forEach(pt => {
 				pt.x = pt.x - adjustXBy;
 			});
@@ -130,8 +131,8 @@ Asteroid.prototype.reset = function reset() {
 		// checkt to see if shape may be off the canvas on the left-side
 		if (rightEdge < 0) {
 			// all x-coordinates are off the screen & we need to update
-			// let adjustXBy = Math.abs(leftEdge) + spacer;
-			let adjustXBy = Math.ceil(Math.abs(leftEdge) / xLimit) * xLimit + spacer;
+			let adjustXBy =
+				Math.ceil(Math.abs(leftEdge) / xLimit) * xLimit + this.options.spacer;
 			this.points.forEach(pt => {
 				pt.x = pt.x + adjustXBy;
 			});
@@ -144,8 +145,8 @@ Asteroid.prototype.reset = function reset() {
 	if (this.options.translateY > 0) {
 		// Case: moving down, could potentially be below canvas
 		if (topEdge > yLimit) {
-			// let adjustYBy = this.canvasElem.height + topEdge + spacer;
-			let adjustYBy = Math.ceil(topEdge / yLimit) * yLimit + spacer;
+			let adjustYBy =
+				Math.ceil(topEdge / yLimit) * yLimit + this.options.spacer;
 			this.points.forEach(pt => {
 				pt.y = pt.y - adjustYBy;
 			});
@@ -154,7 +155,8 @@ Asteroid.prototype.reset = function reset() {
 		// Case; moving up
 		// check if the entire shape is above the canvas
 		if (bottomEdge < 0) {
-			let adjustYBy = Math.ceil(Math.abs(topEdge) / yLimit) * yLimit + spacer;
+			let adjustYBy =
+				Math.ceil(Math.abs(topEdge) / yLimit) * yLimit + this.options.spacer;
 			this.points.forEach(pt => {
 				pt.y = pt.y + adjustYBy;
 			});

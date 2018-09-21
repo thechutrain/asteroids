@@ -5,12 +5,6 @@ const Asteroid = require('./Asteroid');
 let prevTime = window.performance.now();
 let frameTime = 30;
 
-// function paint(highResTimestamp) {
-// 	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); // clear canvas
-
-// 	let box = new Asteroid(ctx);
-// }
-
 const defaultGameOpts = {
 	tickLength: 10, // ms time in between frames
 };
@@ -20,7 +14,6 @@ function Game(opts) {
 	this.options = defaultGameOpts || opts;
 	this.canvasElem = this.getCanvasElement();
 	this.ctx;
-	//TODO: add dimension of the canvas element here:
 
 	// Dynamic Properties
 	this.asteroids = [];
@@ -41,7 +34,7 @@ Game.prototype.repaint = function repaint(numTicks) {
 
 	// CHeck if there are any asteroids
 	if (!this.asteroids.length) {
-		let asteroid = new Asteroid(this.canvasElem, this.ctx);
+		let asteroid = new Asteroid(this);
 		this.asteroids.push(asteroid);
 	} else {
 		// loop through the asteroids
@@ -91,7 +84,6 @@ Game.prototype.init = function init() {
 Game.prototype.getCanvasElement = function getCanvasElement() {
 	const bgCanvas = document.getElementById('bg-canvas');
 
-
 	// Check for compatibility:
 	if (!bgCanvas) {
 		return false;
@@ -109,4 +101,3 @@ Game.prototype.getCanvasElement = function getCanvasElement() {
 //#endregion
 
 module.exports = exports = Game;
-
