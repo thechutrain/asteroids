@@ -13,6 +13,6 @@ yarn-error.log
 
 
 #misc
-.todo.org
+.notes/**
 .temp
 src/assets/sass/vendors/bootstrap/

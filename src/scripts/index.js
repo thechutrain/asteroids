@@ -3,22 +3,20 @@
  */
 'use strict';
 
-// ==== Polyfills =====
+// ==================== Polyfills ====================
 require('./polyfills')();
 
-// ===== Register Event Listeners ====
-const registerEventListenerFn = require('./eventListeners');
-registerEventListenerFn();
+// ==================== Register Event Listeners ====================
+const {
+	registerWindowEventListeners,
+	registerDocumentEventListeners,
+} = require('./eventListeners');
 
-// setTimeout(function() {
-// 	console.log('test ...');
+registerWindowEventListeners();
+registerDocumentEventListeners(main);
 
-// 	let pageTwoEle = document.querySelector('#page-two');
-// 	let parentNode = pageTwoEle.parentNode;
-// 	let top = parentNode.getBoundingClientRect().top;
-// 	console.log(`Scrolling to: ${top}`);
-// 	window.scroll({
-// 		top,
-// 		behavior: 'smooth',
-// 	});
-// }, 2000);
+// ==================== Register Event Listeners ====================
+const Game = require('./canvas');
+function main() {
+	window.Game = new Game();
+}
