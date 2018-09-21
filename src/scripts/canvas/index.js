@@ -1,97 +1,88 @@
 'use strict';
 
+const Asteroid = require('./Asteroid');
+
 let prevTime = window.performance.now();
 let frameTime = 30;
 
-function Rectangle(ctx, options) {
-	const defaultOpts = {
-		startingX: 5,
-		startingY: 10,
-		width: 50,
-		height: 75,
-		color: 'rgba(48, 128, 232, 0.6)',
-		translateX: 0.5,
-		translateY: 2,
-	};
-	this.ctx = ctx; // reference to the context
-	this.options = defaultOpts || {} || options;
-
-	this.draw();
-}
-
-Rectangle.prototype.draw = function() {
-	const { startingX, startingY, width, height } = this.options;
-	this.ctx.fillRect(startingX, startingY, width, height);
-	this.ctx.fillStyle = this.options.color;
+const defaultGameOpts = {
+	tickLength: 10, // ms time in between frames
 };
 
-function paint(highResTimestamp) {
+function Game(opts) {
+	// Static Properties
+	this.options = defaultGameOpts || opts;
+	this.canvasElem = this.getCanvasElement();
+	this.ctx;
+
+	// Dynamic Properties
+	this.asteroids = [];
+	this.lastTick = window.performance.now();
+	this.lastRender = this.lastTick;
+
+	this.init();
+}
+
+Game.prototype.repaint = function repaint(numTicks) {
+	// console.log(numTicks);
+
+	// TEMP: assuming you switch tab or pause:
+	if (numTicks > 5) return;
+
+	// Clear the box:
+	this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+	// CHeck if there are any asteroids
+	if (!this.asteroids.length) {
+		let asteroid = new Asteroid(this);
+		this.asteroids.push(asteroid);
+	} else {
+		// loop through the asteroids
+		this.asteroids.forEach(function(asteroid) {
+			asteroid.draw(numTicks);
+		});
+	}
+};
+
+// ================= initialization & Main thread ===============
+Game.prototype.loop = function loop(timeStamp) {
 	// RequestAnimationFrame as first line, good practice as per se MDN
-	window.requestAnimationFrame(paint.bind(this));
+	window.requestAnimationFrame(this.loop.bind(this));
 
-	// Draw on the canvas:
-	const ctx = this.getContext('2d');
+	const lastRender = this.lastRender;
+	const { tickLength } = this.options;
+	const nextTick = lastRender + tickLength;
+	let numTicks;
 
-	// TODO: determine the number of ticks since last render
-	const timeSinceUpdate = highResTimestamp - prevTime;
-	let ticks = 0;
-
-	if (timeSinceUpdate > frameTime) {
-		ticks = Math.floor(timeSinceUpdate / frameTime);
-		prevTime = window.performance.now(); // or should i do highResTimestamp?
+	if (timeStamp < nextTick) {
+		// CASE: too early for the next frame, avoid layout thrashing
+		return false;
+	} else {
+		// CASE: enough time has passed since last render & time to update by ticks
+		let timeSinceTick = timeStamp - lastRender;
+		numTicks = Math.floor(timeSinceTick / tickLength);
+		this.lastRender = timeStamp;
 	}
 
-	if (ticks === 0) {
+	// II) Repaint && Update
+	this.repaint(numTicks);
+};
+
+Game.prototype.init = function init() {
+	if (!this.canvasElem) {
+		console.warn('No Canvas Element');
 		return;
 	}
 
-	//#region circle
-	// ctx.save();
-	// ctx.beginPath();
-	// ctx.arc(200, 200, 6, 0, Math.PI * 2, true);
-	// ctx.stroke();
-	// ctx.fill();
-	//#endregion
+	// Set context to be 2D
+	this.ctx = this.canvasElem.getContext('2d');
 
-	ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); // clear rectangle
-	// ctx.save();
-	// ctx.restore();
+	window.requestAnimationFrame(this.loop.bind(this));
+};
 
-	// make a box
-
-	// ctx.fillRect(5, 10, 50, 50);
-	// ctx.fillStyle = 'rgba(48, 128, 232, 0.6)';
-	// ctx.translate(0.5 * ticks, 2 * ticks);
-	let box = new Rectangle(ctx);
-	// box.draw();
-
-	// ctx.translate(0.5, 1);
-	// ctx.save();
-
-	// DEBUGGING PURPOSES:
-	// let timePastUpdate = highResTimestamp - prevTime;
-	// if (timePastUpdate > 20) {
-	// 	console.log(timePastUpdate);
-	// }
-	// prevTime = highResTimestamp;
-}
-
-// ================= initialization stuff ===============
-function init() {
-	const bgCanvas = validateCanvas();
-	if (!bgCanvas) return;
-
-	window.requestAnimationFrame(paint.bind(bgCanvas));
-}
-
-/** initializes canvas element & checks that its in the dom
- *
- * @return bgCanvas {canvas Element}
- */
-//#region
-function validateCanvas() {
+//#region getCanvasElement
+Game.prototype.getCanvasElement = function getCanvasElement() {
 	const bgCanvas = document.getElementById('bg-canvas');
-	// let ctx;
 
 	// Check for compatibility:
 	if (!bgCanvas) {
@@ -106,7 +97,7 @@ function validateCanvas() {
 	bgCanvas.height = window.innerHeight;
 
 	return bgCanvas;
-}
+};
 //#endregion
 
-module.exports = exports = init;
+module.exports = exports = Game;
