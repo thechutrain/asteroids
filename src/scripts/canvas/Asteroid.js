@@ -4,8 +4,8 @@ const defaultOpts = {
 	color: 'rgba(48, 128, 232, 0.6)',
 	// draw: true, // immediate draw or not
 	animate: true,
-	translateX: 4,
-	translateY: 0,
+	translateX: -2,
+	translateY: -1,
 };
 
 function Asteroid(canvasElem, ctx, options) {
@@ -36,20 +36,6 @@ Asteroid.prototype.draw = function(ticks) {
 		pt.y = pt.y + moveYBy;
 	});
 
-	// II.) Check if Asteroid values are on screen or not:
-	// let every = this.isOffScreen();
-	// let some = this.isOffScreen(false);
-	// console.log(`Visible? ${this.isVisible()}`);
-	// console.log(`Hidden? ${this.isHidden()}`);
-
-	// if (this.onScreen && !this.isVisible()) {
-	// 	this.onScreen = false;
-	// 	this.reset();
-	// 	console.log('reset!');
-	// } else if (this.isVisible() && !this.onScreen) {
-	// 	this.onScreen = true;
-	// }
-
 	// III.) Draw Asteroid:
 	//#region draw asteroid
 	ctx.save();
@@ -67,33 +53,18 @@ Asteroid.prototype.draw = function(ticks) {
 	ctx.fill();
 	ctx.restore();
 	//#endregion
-};
 
-/**
- *
- * @param {boolean} allPoints - whether to check if all points are off screen or if some
- */
-Asteroid.prototype.isOffScreen = function(allPoints = true) {
-	const xLimit = this.canvasElem.width;
-	const yLimit = this.canvasElem.height;
-	let someOffScreen = false;
-	let everyOffScreen = true;
+	// II.) Check if Asteroid values are on screen or not:
+	if (!this.onScreen && this.isVisible()) {
+		this.onScreen = true;
+	}
 
-	this.points.forEach(pt => {
-		if (pt.x > xLimit || pt.x < 0) {
-			someOffScreen = true;
-		} else {
-			everyOffScreen = false;
-		}
+	if (this.isHidden()) {
+		this.onScreen = false;
+		this.reset();
+	}
 
-		if (pt.y > yLimit || pt.y < 0) {
-			someOffScreen = true;
-		} else {
-			everyOffScreen = false;
-		}
-	});
-
-	return allPoints ? everyOffScreen : someOffScreen;
+	console.log(this.onScreen);
 };
 
 //*NOTE: both isVisible && isHidden --> checks that EVERY point is either hidden or visible
@@ -133,14 +104,10 @@ Asteroid.prototype.reset = function reset() {
 	// Determine left, right, top, bottom bounds of our shape:
 	const leftEdge = findMin(this.points, 'x');
 	const rightEdge = findMax(this.points, 'x');
-	const topEdge = findMax(this.points, 'y');
-	const bottomEdge = findMin(this.points, 'y');
+	const bottomEdge = findMax(this.points, 'y');
+	const topEdge = findMin(this.points, 'y');
 
-	// DEBUGGING
-	console.log(this.points);
-	debugger;
-
-	// ==== ADJUST X-coordinates
+	// ===== ADJUST X-coordinates =====
 	// CASE: moving right
 	if (this.options.translateX > 0) {
 		// Check to see if the trailing edge (far left x-coord on shape) is off screen
@@ -159,35 +126,35 @@ Asteroid.prototype.reset = function reset() {
 		if (rightEdge < 0) {
 			// all x-coordinates are off the screen & we need to update
 			// let adjustXBy = Math.abs(leftEdge) + spacer;
-			let adjustXBy = Math.ceil(Math.abs(leftEdge) / xLimit) + spacer;
+			let adjustXBy = Math.ceil(Math.abs(leftEdge) / xLimit) * xLimit + spacer;
 			this.points.forEach(pt => {
-				pt.x = Math.abs(pt.x) + adjustXBy;
+				pt.x = pt.x + adjustXBy;
 			});
 			updatedX = true;
 		}
 	}
 
+	// ===== ADJUST Y-coordinates =====
 	// CASE: moving down
-	// if (this.options.translateY > 0) {
-	// 	// Case: moving down, could potentially be below canvas
-	// 	if (bottomEdge > yLimit) {
-	// 		let adjustYBy = this.canvasElem.height + topEdge + spacer;
-	// 		this.points.forEach(pt => {
-	// 			pt.y = pt.y - adjustYBy;
-	// 		});
-	// 	}
-	// } else {
-	// 	// Case; moving up
-	// 	// check if the entire shape is above the canvas
-	// 	if (topEdge < 0) {
-	// 		let adjustYBy = this.canvasElem.height + Math.abs(bottomEdge) + spacer;
-	// 		this.points.forEach(pt => {
-	// 			pt.y = pt.y - adjustYBy;
-	// 		});
-	// 	}
-	// }
-
-	debugger;
+	if (this.options.translateY > 0) {
+		// Case: moving down, could potentially be below canvas
+		if (topEdge > yLimit) {
+			// let adjustYBy = this.canvasElem.height + topEdge + spacer;
+			let adjustYBy = Math.ceil(topEdge / yLimit) * yLimit + spacer;
+			this.points.forEach(pt => {
+				pt.y = pt.y - adjustYBy;
+			});
+		}
+	} else {
+		// Case; moving up
+		// check if the entire shape is above the canvas
+		if (bottomEdge < 0) {
+			let adjustYBy = Math.ceil(Math.abs(topEdge) / yLimit) * yLimit + spacer;
+			this.points.forEach(pt => {
+				pt.y = pt.y + adjustYBy;
+			});
+		}
+	}
 };
 
 // ============== utility functions =======
