@@ -91,6 +91,7 @@ Game.prototype.init = function init() {
 Game.prototype.getCanvasElement = function getCanvasElement() {
 	const bgCanvas = document.getElementById('bg-canvas');
 
+
 	// Check for compatibility:
 	if (!bgCanvas) {
 		return false;
@@ -108,3 +109,4 @@ Game.prototype.getCanvasElement = function getCanvasElement() {
 //#endregion
 
 module.exports = exports = Game;
+
