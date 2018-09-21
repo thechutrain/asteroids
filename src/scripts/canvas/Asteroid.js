@@ -2,7 +2,6 @@
 
 const defaultOpts = {
 	color: 'rgba(48, 128, 232, 0.6)',
-	// draw: true, // immediate draw or not
 	animate: true,
 	translateX: -2,
 	translateY: -1,
@@ -20,9 +19,7 @@ function Asteroid(canvasElem, ctx, options) {
 		{ x: 50, y: 100 },
 		{ x: 0, y: 0 },
 	];
-	this.onScreen = true; // {bln} - when true, means at least one point is on the canvas
-
-	this.foo = true;
+	this.onScreen = true; // when true, means at least one point is on the canvas
 }
 
 Asteroid.prototype.draw = function(ticks) {
@@ -37,7 +34,7 @@ Asteroid.prototype.draw = function(ticks) {
 		pt.y = pt.y + moveYBy;
 	});
 
-	// III.) Draw Asteroid:
+	// II.) Draw Asteroid:
 	//#region draw asteroid
 	ctx.save();
 	ctx.fillStyle = color;
@@ -55,24 +52,27 @@ Asteroid.prototype.draw = function(ticks) {
 	ctx.restore();
 	//#endregion
 
-	// II.) Check if Asteroid values are on screen or not:
+	// III.) Check if Asteroid values are on screen or not:
 	if (!this.onScreen && this.isVisible()) {
 		this.onScreen = true;
-	}
-
-	if (this.isHidden()) {
+	} else if (this.isHidden()) {
 		this.onScreen = false;
 		this.reset();
 	}
-
-	console.log(this.onScreen);
 };
 
-//*NOTE: both isVisible && isHidden --> checks that EVERY point is either hidden or visible
+// ========= Visibility utility functions ==========
+//#region visibility utility functions
+/** isPartiallayVisible)_
+ * @returns {boolean} - true --> indicates that the shape is partially hidden & partially visible.
+ */
 Asteroid.prototype.isPartiallyVisible = function() {
 	return !this.isVisible() && !this.isHidden();
 };
 
+/** isVisible()
+ * @returns {boolean} - true --> the entire asteroid/shape is visible on the screen
+ */
 Asteroid.prototype.isVisible = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
@@ -84,6 +84,9 @@ Asteroid.prototype.isVisible = function() {
 	});
 };
 
+/** isHidden()
+ * @returns {boolean} - true, indicates the entire asteroid/shape is off screen
+ */
 Asteroid.prototype.isHidden = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
@@ -93,6 +96,7 @@ Asteroid.prototype.isHidden = function() {
 		return x < 0 || x > xLimit || y < 0 || y > yLimit;
 	});
 };
+//#endregion
 
 Asteroid.prototype.reset = function reset() {
 	const xLimit = this.canvasElem.width;
@@ -159,6 +163,7 @@ Asteroid.prototype.reset = function reset() {
 };
 
 // ============== utility functions =======
+//TODO: optimize this so that we get all the bounds of the polygon in one loop!
 function findMax(listPts, strCoord = 'x') {
 	let max;
 	listPts.forEach((pt, i) => {
