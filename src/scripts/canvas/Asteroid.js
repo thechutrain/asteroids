@@ -103,40 +103,39 @@ Asteroid.prototype.isHidden = function() {
 Asteroid.prototype.reset = function reset() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
-
-	let updatedX = false;
-	let updatedY = false;
+	let blnUpdated = false;
 
 	// Determine left, right, top, bottom bounds of our shape:
-	const leftEdge = findMin(this.points, 'x');
-	const rightEdge = findMax(this.points, 'x');
-	const bottomEdge = findMax(this.points, 'y');
-	const topEdge = findMin(this.points, 'y');
+	const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
 
 	// ===== ADJUST X-coordinates =====
 	// CASE: moving right
 	if (this.options.translateX > 0) {
 		// Check to see if the trailing edge (far left x-coord on shape) is off screen
-		if (leftEdge > xLimit) {
+		if (leftBound > xLimit) {
 			// then adjust all the x-coordinates
 			let adjustXBy =
-				Math.ceil(rightEdge / xLimit) * xLimit + this.options.spacer;
+				Math.ceil(rightBound / xLimit) * xLimit + this.options.spacer;
+
 			this.points.forEach(pt => {
 				pt.x = pt.x - adjustXBy;
 			});
-			updatedX = true;
+
+			blnUpdated = true;
 		}
 	} else {
 		// CASE: moving left
 		// checkt to see if shape may be off the canvas on the left-side
-		if (rightEdge < 0) {
+		if (rightBound < 0) {
 			// all x-coordinates are off the screen & we need to update
 			let adjustXBy =
-				Math.ceil(Math.abs(leftEdge) / xLimit) * xLimit + this.options.spacer;
+				Math.ceil(Math.abs(leftBound) / xLimit) * xLimit + this.options.spacer;
+
 			this.points.forEach(pt => {
 				pt.x = pt.x + adjustXBy;
 			});
-			updatedX = true;
+
+			blnUpdated = true;
 		}
 	}
 
@@ -144,50 +143,51 @@ Asteroid.prototype.reset = function reset() {
 	// CASE: moving down
 	if (this.options.translateY > 0) {
 		// Case: moving down, could potentially be below canvas
-		if (topEdge > yLimit) {
+		if (upperBound > yLimit) {
 			let adjustYBy =
-				Math.ceil(topEdge / yLimit) * yLimit + this.options.spacer;
+				Math.ceil(upperBound / yLimit) * yLimit + this.options.spacer;
+
 			this.points.forEach(pt => {
 				pt.y = pt.y - adjustYBy;
 			});
+
+			blnUpdated = true;
 		}
 	} else {
 		// Case; moving up
 		// check if the entire shape is above the canvas
-		if (bottomEdge < 0) {
+		if (lowerBound < 0) {
 			let adjustYBy =
-				Math.ceil(Math.abs(topEdge) / yLimit) * yLimit + this.options.spacer;
+				Math.ceil(Math.abs(upperBound) / yLimit) * yLimit + this.options.spacer;
+
 			this.points.forEach(pt => {
 				pt.y = pt.y + adjustYBy;
 			});
+
+			blnUpdated = true;
 		}
 	}
+
+	return blnUpdated;
 };
 
-// ============== utility functions =======
-//TODO: optimize this so that we get all the bounds of the polygon in one loop!
-function findMax(listPts, strCoord = 'x') {
-	let max;
-	listPts.forEach((pt, i) => {
-		if (i == 0) {
-			max = strCoord === 'y' ? pt.y : pt.x;
+Asteroid.prototype.getBounds = function() {
+	let leftBound, rightBound, upperBound, lowerBound;
+	this.points.forEach((pt, i) => {
+		let { x, y } = pt;
+		//Set default:
+		if (i === 0) {
+			leftBound = rightBound = x;
+			upperBound = lowerBound = y;
 		} else {
-			max = strCoord === 'y' ? Math.max(max, pt.y) : Math.max(max, pt.x);
+			leftBound = Math.min(leftBound, x);
+			rightBound = Math.max(rightBound, x);
+			upperBound = Math.min(upperBound, y);
+			lowerBound = Math.max(lowerBound, y);
 		}
 	});
-	return max;
-}
 
-function findMin(listPts, strCoord = 'x') {
-	let min;
-	listPts.forEach((pt, i) => {
-		if (i == 0) {
-			min = strCoord === 'y' ? pt.y : pt.x;
-		} else {
-			min = strCoord === 'y' ? Math.min(min, pt.y) : Math.min(min, pt.x);
-		}
-	});
-	return min;
-}
+	return { leftBound, rightBound, upperBound, lowerBound };
+};
 
 module.exports = exports = Asteroid;
