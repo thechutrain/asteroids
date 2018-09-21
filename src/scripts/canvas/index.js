@@ -12,7 +12,7 @@ let frameTime = 30;
 // }
 
 const defaultGameOpts = {
-	tickLength: 30, // ms time in between frames
+	tickLength: 10, // ms time in between frames
 };
 
 function Game(opts) {
