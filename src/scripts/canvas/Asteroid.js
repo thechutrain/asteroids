@@ -4,8 +4,8 @@ const defaultOpts = {
 	color: 'rgba(48, 128, 232, 0.6)',
 	// draw: true, // immediate draw or not
 	animate: true,
-	translateX: 2,
-	translateY: 4,
+	translateX: 4,
+	translateY: 0,
 };
 
 function Asteroid(canvasElem, ctx, options) {
@@ -39,13 +39,16 @@ Asteroid.prototype.draw = function(ticks) {
 	// II.) Check if Asteroid values are on screen or not:
 	// let every = this.isOffScreen();
 	// let some = this.isOffScreen(false);
-	if (this.onScreen && !this.isVisible()) {
-		this.onScreen = false;
-		this.reset();
-		console.log('reset!');
-	} else if (this.isVisible() && !this.onScreen) {
-		this.onScreen = true;
-	}
+	// console.log(`Visible? ${this.isVisible()}`);
+	// console.log(`Hidden? ${this.isHidden()}`);
+
+	// if (this.onScreen && !this.isVisible()) {
+	// 	this.onScreen = false;
+	// 	this.reset();
+	// 	console.log('reset!');
+	// } else if (this.isVisible() && !this.onScreen) {
+	// 	this.onScreen = true;
+	// }
 
 	// III.) Draw Asteroid:
 	//#region draw asteroid
@@ -65,27 +68,6 @@ Asteroid.prototype.draw = function(ticks) {
 	ctx.restore();
 	//#endregion
 };
-
-/** --------- offScreen() ---------
- * returns {bool} - whether asteroid is on the screen or not
- */
-// TODO: temp not precise, but good enough for now
-// Asteroid.prototype.offScreen = function offScreen() {
-// 	const xLimit = this.canvasElem.width;
-// 	const yLimit = this.canvasElem.height;
-// 	let someOffScreen = false;
-// 	// let everyPtOffScreen //TODO: for more precision
-
-// 	if (this.options.startingX < 0 || this.options.startingX > xLimit) {
-// 		someOffScreen = true;
-// 	}
-
-// 	if (this.options.startingY < 0 || this.options.startingY > yLimit) {
-// 		someOffScreen = true;
-// 	}
-
-// 	return someOffScreen;
-// };
 
 /**
  *
@@ -114,28 +96,36 @@ Asteroid.prototype.isOffScreen = function(allPoints = true) {
 	return allPoints ? everyOffScreen : someOffScreen;
 };
 
+//*NOTE: both isVisible && isHidden --> checks that EVERY point is either hidden or visible
+Asteroid.prototype.isPartiallyVisible = function() {
+	return !this.isVisible() && !this.isHidden();
+};
+
 Asteroid.prototype.isVisible = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
-	let isVisible = false;
+	// let isVisible = false;
 
-	for (let i = 0; i < this.points.length; i++) {
-		let { x, y } = this.points[i];
-		if (x < xLimit && x > 0) {
-			if (y < yLimit && y > 0) {
-				isVisible = true;
-				break;
-			}
-		}
-	}
+	return this.points.every(pt => {
+		let { x, y } = pt;
+		return x >= 0 && x <= xLimit && y >= 0 && y <= yLimit;
+	});
+};
 
-	return isVisible;
+Asteroid.prototype.isHidden = function() {
+	const xLimit = this.canvasElem.width;
+	const yLimit = this.canvasElem.height;
+
+	return this.points.every(pt => {
+		let { x, y } = pt;
+		return x < 0 || x > xLimit || y < 0 || y > yLimit;
+	});
 };
 
 Asteroid.prototype.reset = function reset() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
-	const spacer = 10;
+	const spacer = 2;
 
 	let updatedX = false;
 	let updatedY = false;
@@ -156,7 +146,8 @@ Asteroid.prototype.reset = function reset() {
 		// Check to see if the trailing edge (far left x-coord on shape) is off screen
 		if (leftEdge > xLimit) {
 			// then adjust all the x-coordinates
-			let adjustXBy = this.canvasElem.width + rightEdge + spacer;
+			// let adjustXBy = Math.ceil(leftEdge / xLimit) + spacer;
+			let adjustXBy = Math.ceil(rightEdge / xLimit) * xLimit + spacer;
 			this.points.forEach(pt => {
 				pt.x = pt.x - adjustXBy;
 			});
@@ -167,33 +158,34 @@ Asteroid.prototype.reset = function reset() {
 		// checkt to see if shape may be off the canvas on the left-side
 		if (rightEdge < 0) {
 			// all x-coordinates are off the screen & we need to update
-			let adjustXBy = this.canvasElem.width + Math.abs(leftEdge) + spacer;
+			// let adjustXBy = Math.abs(leftEdge) + spacer;
+			let adjustXBy = Math.ceil(Math.abs(leftEdge) / xLimit) + spacer;
 			this.points.forEach(pt => {
-				pt.x = pt.x + adjustXBy;
+				pt.x = Math.abs(pt.x) + adjustXBy;
 			});
 			updatedX = true;
 		}
 	}
 
 	// CASE: moving down
-	if (this.options.translateY > 0) {
-		// Case: moving down, could potentially be below canvas
-		if (bottomEdge > yLimit) {
-			let adjustYBy = this.canvasElem.height + topEdge + spacer;
-			this.points.forEach(pt => {
-				pt.y = pt.y - adjustYBy;
-			});
-		}
-	} else {
-		// Case; moving up
-		// check if the entire shape is above the canvas
-		if (topEdge < 0) {
-			let adjustYBy = this.canvasElem.height + Math.abs(bottomEdge) + spacer;
-			this.points.forEach(pt => {
-				pt.y = pt.y - adjustYBy;
-			});
-		}
-	}
+	// if (this.options.translateY > 0) {
+	// 	// Case: moving down, could potentially be below canvas
+	// 	if (bottomEdge > yLimit) {
+	// 		let adjustYBy = this.canvasElem.height + topEdge + spacer;
+	// 		this.points.forEach(pt => {
+	// 			pt.y = pt.y - adjustYBy;
+	// 		});
+	// 	}
+	// } else {
+	// 	// Case; moving up
+	// 	// check if the entire shape is above the canvas
+	// 	if (topEdge < 0) {
+	// 		let adjustYBy = this.canvasElem.height + Math.abs(bottomEdge) + spacer;
+	// 		this.points.forEach(pt => {
+	// 			pt.y = pt.y - adjustYBy;
+	// 		});
+	// 	}
+	// }
 
 	debugger;
 };
