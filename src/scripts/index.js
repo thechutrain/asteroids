@@ -17,6 +17,9 @@ registerDocumentEventListeners(main);
 
 // ==================== Register Event Listeners ====================
 const Game = require('./canvas');
+
+console.log('starting game ...');
+
 function main() {
 	window.Game = new Game();
 }
