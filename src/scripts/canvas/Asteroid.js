@@ -31,8 +31,10 @@ function Asteroid(gameRef, options) {
 
 Asteroid.prototype.init = function() {
 	// GENERATE RANDOM DIRECTION & SPEED
+	// if (this.options)
+	// debugger;
 	const xUpperSpeedBound = 3;
-	const xLowerSpeedBound = -2;
+	const xLowerSpeedBound = -1;
 	this.options.translateX = Math.floor(
 		Math.random() * (xUpperSpeedBound - xLowerSpeedBound) + xLowerSpeedBound
 	);
@@ -46,7 +48,7 @@ Asteroid.prototype.init = function() {
 
 Asteroid.prototype.draw = function(ticks) {
 	const ctx = this.ctx;
-	const { color, animate, translateX, translateY } = this.options;
+	const { color, translateX, translateY } = this.options;
 	const moveXBy = ticks * translateX;
 	const moveYBy = ticks * translateY;
 
@@ -209,5 +211,7 @@ Asteroid.prototype.getBounds = function() {
 
 	return { leftBound, rightBound, upperBound, lowerBound };
 };
+
+// function mergeOptions(opts) {}
 
 module.exports = exports = Asteroid;
