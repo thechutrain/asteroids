@@ -23,25 +23,25 @@ function Game(opts) {
 	this.init();
 }
 
-Game.prototype.repaint = function repaint(numTicks) {
+Game.prototype.repaint = function repaint(numTicks, timeStamp) {
 	// console.log(numTicks);
 
 	// TEMP: assuming you switch tab or pause:
 	if (numTicks > 5) return;
 
 	// Clear the box:
-	this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
-	// CHeck if there are any asteroids
-	if (!this.asteroids.length) {
+	// TESTING PURPOSE: add one asteroid here
+	if (this.asteroids.length === 0) {
 		let asteroid = new Asteroid(this);
 		this.asteroids.push(asteroid);
-	} else {
-		// loop through the asteroids
-		this.asteroids.forEach(function(asteroid) {
-			asteroid.draw(numTicks);
-		});
 	}
+	// CHeck if there are any asteroids
+	// loop through the asteroids
+	this.asteroids.forEach(function(asteroid) {
+		asteroid.draw(numTicks);
+	});
 };
 
 // ================= initialization & Main thread ===============
@@ -65,7 +65,7 @@ Game.prototype.loop = function loop(timeStamp) {
 	}
 
 	// II) Repaint && Update
-	this.repaint(numTicks);
+	this.repaint(numTicks, timeStamp);
 };
 
 Game.prototype.init = function init() {
