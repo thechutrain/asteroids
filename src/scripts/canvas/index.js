@@ -1,6 +1,7 @@
 'use strict';
 
 const Asteroid = require('./Asteroid');
+const Spaceship = require('./Spaceship');
 
 const defaultGameOpts = {
 	tickLength: 10, // ms time in between frames
@@ -15,6 +16,8 @@ function Game(opts) {
 
 	// Dynamic Properties
 	this.asteroids = [];
+	this.spaceship;
+
 	this.lastTick = window.performance.now();
 	this.lastRender = this.lastTick;
 
@@ -31,10 +34,17 @@ Game.prototype.repaint = function repaint(numTicks) {
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 	// TESTING PURPOSE: add one asteroid here
-	if (this.asteroids.length === 0) {
-		let asteroid = new Asteroid(this);
-		this.asteroids.push(asteroid);
+	// DEBUGGING - removed asteroid
+	// if (this.asteroids.length === 0) {
+	// 	let asteroid = new Asteroid(this);
+	// 	this.asteroids.push(asteroid);
+	// }
+	if (!this.spaceship) {
+		this.spaceship = new Spaceship(this);
+	} else {
+		this.spaceship.draw();
 	}
+
 	// CHeck if there are any asteroids
 	// loop through the asteroids
 	this.asteroids.forEach(function(asteroid) {
