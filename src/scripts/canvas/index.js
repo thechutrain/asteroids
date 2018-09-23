@@ -2,11 +2,9 @@
 
 const Asteroid = require('./Asteroid');
 
-let prevTime = window.performance.now();
-let frameTime = 30;
-
 const defaultGameOpts = {
 	tickLength: 10, // ms time in between frames
+	numTicksBeforePausing: 5,
 };
 
 function Game(opts) {
@@ -23,11 +21,11 @@ function Game(opts) {
 	this.init();
 }
 
-Game.prototype.repaint = function repaint(numTicks, timeStamp) {
+Game.prototype.repaint = function repaint(numTicks) {
 	// console.log(numTicks);
 
 	// TEMP: assuming you switch tab or pause:
-	if (numTicks > 5) return;
+	if (numTicks > this.options.numTicksBeforePausing) return;
 
 	// Clear the box:
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
