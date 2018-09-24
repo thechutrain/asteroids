@@ -42,7 +42,7 @@ Game.prototype.repaint = function repaint(numTicks) {
 	if (!this.spaceship) {
 		this.spaceship = new Spaceship(this);
 	} else {
-		this.spaceship.draw(numTicks);
+		this.spaceship.repaint(numTicks);
 	}
 
 	// CHeck if there are any asteroids
@@ -61,8 +61,12 @@ Game.prototype.emitEvent = function(event) {
 		break;
 	case 'ArrowRight':
 		console.log('rotate right');
-		this.spaceship.offSet += 20;
+		this.spaceship.offSet += 10;
 		// this.spaceship.move();
+		break;
+	case 'ArrowLeft':
+		console.log('rotate left');
+		this.spaceship.offSet -= 10;
 		break;
 	default:
 		console.warn(`Could not process ${event}`);

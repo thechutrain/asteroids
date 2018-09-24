@@ -19,12 +19,11 @@ function Spaceship(gameRef, options) {
 	this.onScreen = true;
 
 	// MOVEMENT related properties:
-	this.blnThrottleOn = false;
+	this.engineOn = true;
+	// this.blnThrottleOn = false;
 	this.throttleTimer;
 	this.velocity;
 	this.rotate = false;
-
-	console.log('making spaceship!');
 }
 
 Spaceship.prototype.calcPoints = function() {
@@ -32,7 +31,15 @@ Spaceship.prototype.calcPoints = function() {
 	this.points = [];
 
 	// Transform origin & angle here:
+	if (this.engineOn) {
+		let velocity = 5;
+		this.origin.x =
+			this.origin.x - velocity * Math.sin((Math.PI * this.offSet) / 180);
+		this.origin.y =
+			this.origin.y - velocity * Math.cos((Math.PI * this.offSet) / 180);
+	}
 
+	// Determine 3 points of triangle here:
 	let angle1 = this.offSet;
 	let x1 = this.origin.x - (Math.sin((Math.PI * angle1) / 180) * h) / 2;
 	let y1 = this.origin.y - (Math.cos((Math.PI * angle1) / 180) * h) / 2;
@@ -51,9 +58,7 @@ Spaceship.prototype.calcPoints = function() {
 	this.points.push({ x: x3, y: y3 });
 };
 
-Spaceship.prototype.draw = function(numTicks) {
-	const ctx = this.ctx;
-
+Spaceship.prototype.repaint = function(numTicks) {
 	// If throttle is on, move the ship:
 	// if (this.blnThrottleOn) {
 	// 	this.points.forEach(pt => {
@@ -65,6 +70,22 @@ Spaceship.prototype.draw = function(numTicks) {
 
 	this.calcPoints();
 
+	this.draw();
+
+	if (!this.onScreen && this.isVisible()) {
+		this.onScreen = this;
+	} else if (this.isHidden()) {
+		this.onScreen = false;
+
+		this.reset();
+	}
+};
+
+Spaceship.prototype.draw = function() {
+	const ctx = this.ctx;
+
+	// Draw the main triangle
+	ctx.globalCompositeOperation = 'source-over';
 	ctx.save();
 	ctx.fillStyle = 'black';
 	ctx.beginPath();
@@ -80,13 +101,15 @@ Spaceship.prototype.draw = function(numTicks) {
 	ctx.fill();
 	ctx.restore();
 
-	// if (!this.onScreen && this.isVisible()) {
-	// 	this.onScreen = this;
-	// } else if (this.isHidden()) {
-	// 	this.onScreen = false;
-
-	// 	this.reset();
-	// }
+	// Draw the opaque bottom triangle
+	ctx.globalCompositeOperation = 'destination-out';
+	ctx.beginPath();
+	ctx.moveTo(this.origin.x, this.origin.y);
+	ctx.lineTo(this.points[1].x, this.points[1].y);
+	ctx.lineTo(this.points[2].x, this.points[2].y);
+	ctx.closePath();
+	ctx.fill();
+	ctx.globalCompositeOperation = 'source-over';
 };
 
 // Spaceship.prototype.triggerThrusters = function() {
@@ -109,80 +132,74 @@ Spaceship.prototype.draw = function(numTicks) {
 // 	);
 // };
 
-// Spaceship.prototype.move = function() {
-// 	this.rotate = true;
-// };
+Spaceship.prototype.isVisible = function() {
+	const xLimit = this.canvasElem.width;
+	const yLimit = this.canvasElem.height;
 
-// Spaceship.prototype.isVisible = function() {
-// 	const xLimit = this.canvasElem.width;
-// 	const yLimit = this.canvasElem.height;
+	return this.points.every(pt => {
+		let { x, y } = pt;
+		return x >= 0 && x <= xLimit && y >= 0 && y <= yLimit;
+	});
+};
 
-// 	return this.points.every(pt => {
-// 		let { x, y } = pt;
-// 		return x >= 0 && x <= xLimit && y >= 0 && y <= yLimit;
-// 	});
-// };
+Spaceship.prototype.isHidden = function() {
+	const xLimit = this.canvasElem.width;
+	const yLimit = this.canvasElem.height;
 
-// Spaceship.prototype.isHidden = function() {
-// 	const xLimit = this.canvasElem.width;
-// 	const yLimit = this.canvasElem.height;
+	return this.points.every(pt => {
+		let { x, y } = pt;
+		return x < 0 || x > xLimit || y < 0 || y > yLimit;
+	});
+};
 
-// 	return this.points.every(pt => {
-// 		let { x, y } = pt;
-// 		return x < 0 || x > xLimit || y < 0 || y > yLimit;
-// 	});
-// };
+Spaceship.prototype.getBounds = function() {
+	let leftBound, rightBound, upperBound, lowerBound;
+	this.points.forEach((pt, i) => {
+		let { x, y } = pt;
+		if (i === 0) {
+			//Sets default values
+			leftBound = rightBound = x;
+			upperBound = lowerBound = y;
+		} else {
+			leftBound = Math.min(leftBound, x);
+			rightBound = Math.max(rightBound, x);
+			upperBound = Math.min(upperBound, y);
+			lowerBound = Math.max(lowerBound, y);
+		}
+	});
 
-// Spaceship.prototype.getBounds = function() {
-// 	let leftBound, rightBound, upperBound, lowerBound;
-// 	this.points.forEach((pt, i) => {
-// 		let { x, y } = pt;
-// 		if (i === 0) {
-// 			//Sets default values
-// 			leftBound = rightBound = x;
-// 			upperBound = lowerBound = y;
-// 		} else {
-// 			leftBound = Math.min(leftBound, x);
-// 			rightBound = Math.max(rightBound, x);
-// 			upperBound = Math.min(upperBound, y);
-// 			lowerBound = Math.max(lowerBound, y);
-// 		}
-// 	});
+	return { leftBound, rightBound, upperBound, lowerBound };
+};
 
-// 	return { leftBound, rightBound, upperBound, lowerBound };
-// };
+Spaceship.prototype.reset = function() {
+	const xLimit = this.canvasElem.width;
+	const yLimit = this.canvasElem.height;
+	let adjustXBy = 0;
+	let adjustYBy = 0;
 
-// Spaceship.prototype.reset = function() {
-// 	const xLimit = this.canvasElem.width;
-// 	const yLimit = this.canvasElem.height;
-// 	let adjustXBy = 0;
-// 	let adjustYBy = 0;
+	// Determine left, right, top, bottom bounds of our shape:
+	const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
 
-// 	// Determine left, right, top, bottom bounds of our shape:
-// 	const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
+	// Determine x-axis adjustments:
+	if (leftBound > xLimit) {
+		// adjustXBy =
+		// 	-1 * Math.ceil(rightBound / xLimit) * xLimit + this.options.spacer;
+		adjustXBy = (rightBound + this.options.spacer) * -1;
+	} else if (rightBound < 0) {
+		// adjustXBy = Math.ceil(leftBound / xLimit) * xLimit + this.options.spacer;
+		adjustXBy = Math.abs(leftBound) + xLimit + this.options.spacer;
+	}
 
-// 	// Determine x-axis adjustments:
-// 	if (leftBound > xLimit) {
-// 		// adjustXBy =
-// 		// 	-1 * Math.ceil(rightBound / xLimit) * xLimit + this.options.spacer;
-// 		adjustXBy = (rightBound + this.options.spacer) * -1;
-// 	} else if (rightBound < 0) {
-// 		// adjustXBy = Math.ceil(leftBound / xLimit) * xLimit + this.options.spacer;
-// 		adjustXBy = Math.abs(leftBound) + xLimit + this.options.spacer;
-// 	}
+	// Determine y-axis adjustments:
+	if (upperBound > yLimit) {
+		adjustYBy = -1 * (lowerBound + this.options.spacer);
+	} else if (lowerBound < 0) {
+		adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
+	}
 
-// 	// Determine y-axis adjustments:
-// 	if (upperBound > yLimit) {
-// 		adjustYBy = -1 * (lowerBound + this.options.spacer);
-// 	} else if (lowerBound < 0) {
-// 		adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
-// 	}
-
-// 	// Loop through points:
-// 	this.points.forEach(pt => {
-// 		pt.x = pt.x + adjustXBy;
-// 		pt.y = pt.y + adjustYBy;
-// 	});
-// };
+	// Loop through points:
+	this.origin.x = this.origin.x + adjustXBy;
+	this.origin.y = this.origin.y + adjustYBy;
+};
 
 module.exports = Spaceship;
