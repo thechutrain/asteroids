@@ -42,7 +42,7 @@ Game.prototype.repaint = function repaint(numTicks) {
 	if (!this.spaceship) {
 		this.spaceship = new Spaceship(this);
 	} else {
-		this.spaceship.draw();
+		this.spaceship.draw(numTicks);
 	}
 
 	// CHeck if there are any asteroids
