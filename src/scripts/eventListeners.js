@@ -41,6 +41,8 @@ const documentEventListeners = [
 				window.Game.emitEvent('ArrowUp');
 			} else if (e.key === 'ArrowRight') {
 				window.Game.emitEvent('ArrowRight');
+			} else if (e.key === 'ArrowLeft') {
+				window.Game.emitEvent('ArrowLeft');
 			}
 		},
 	},
