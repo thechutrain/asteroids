@@ -12,8 +12,12 @@ function Spaceship(gameRef, options) {
 	this.options = defaultOpts || {} || options;
 
 	this.points = [{ x: 50, y: 50 }, { x: 65, y: 60 }, { x: 50, y: 70 }];
-	this.blnThrottle = true;
 	this.onScreen = true;
+
+	// Thruster related properties:
+	this.blnThrottleOn = false;
+	this.throttleTimer;
+	this.velocity;
 
 	console.log('making spaceship!');
 }
@@ -22,11 +26,11 @@ Spaceship.prototype.draw = function(numTicks) {
 	const ctx = this.ctx;
 
 	// If throttle is on, move the ship:
-	if (this.blnThrottle) {
+	if (this.blnThrottleOn) {
 		this.points.forEach(pt => {
 			// pt.x = pt.x + numTicks * this.options.maxSpeed;
-			pt.x = pt.x + 3;
-			pt.y = pt.y - 4;
+			pt.x = pt.x + this.velocity * numTicks;
+			// pt.y = pt.y - 4 * numTicks;
 		});
 	}
 
@@ -52,6 +56,26 @@ Spaceship.prototype.draw = function(numTicks) {
 
 		this.reset();
 	}
+};
+
+Spaceship.prototype.triggerThrusters = function() {
+	this.blnThrottleOn = true;
+	this.velocity = 5;
+
+	if (this.throttleTimer) {
+		clearInterval(this.throttleTimer);
+	}
+
+	this.throttleTimer = setInterval(
+		function() {
+			this.velocity = this.velocity * 0.8;
+			if (this.velocity < 1) {
+				this.velocity = 0;
+				clearInterval(this.throttleTimer);
+			}
+		}.bind(this),
+		200
+	);
 };
 
 Spaceship.prototype.isVisible = function() {

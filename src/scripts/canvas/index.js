@@ -4,7 +4,7 @@ const Asteroid = require('./Asteroid');
 const Spaceship = require('./Spaceship');
 
 const defaultGameOpts = {
-	tickLength: 10, // ms time in between frames
+	tickLength: 50, // ms time in between frames
 	numTicksBeforePausing: 5,
 };
 
@@ -50,6 +50,18 @@ Game.prototype.repaint = function repaint(numTicks) {
 	this.asteroids.forEach(function(asteroid) {
 		asteroid.draw(numTicks);
 	});
+};
+
+// ================= Game related events ================
+Game.prototype.emitEvent = function(event) {
+	switch (event) {
+	case 'ArrowUp':
+		console.log('triggering thrusters');
+		this.spaceship.triggerThrusters();
+		break;
+	default:
+		console.warn(`Could not process ${event}`);
+	}
 };
 
 // ================= initialization & Main thread ===============

@@ -35,10 +35,11 @@ function registerWindowEventListeners() {
 const documentEventListeners = [
 	// Test event listener here
 	{
-		event: 'click',
+		event: 'keydown',
 		cb: function(e) {
-			// debugger;
-			// console.log(`I occured: ${e}`);
+			if (e.key === 'ArrowUp') {
+				window.Game.emitEvent('ArrowUp');
+			}
 		},
 	},
 ];
