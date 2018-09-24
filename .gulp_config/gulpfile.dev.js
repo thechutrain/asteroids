@@ -114,29 +114,29 @@ function gulpDevFn(gulp, config) {
 
 	// ============ JS/Browserify =====
 	//#region browserify() && watchify()
-	// gulp.task('browserify', function() {
-	// 	let entryFile = path.join(config.src_js_dir, config.src_js_entry_file);
-	// 	const b = browserify({
-	// 		entries: [entryFile],
-	// 		debug: true,
-	// 	});
+	gulp.task('browserify', function() {
+		let entryFile = path.join(config.src_js_dir, config.src_js_entry_file);
+		const b = browserify({
+			entries: [entryFile],
+			debug: true,
+		});
 
-	// 	return b
-	// 		.bundle()
-	// 		.on('error', function(e) {
-	// 			// console.log(`Browserify error: ${e}`);
-	// 		})
-	// 		.pipe(source('bundle.js'))
-	// 		.pipe(buffer())
-	// 		.pipe(sourcemaps.init())
-	// 		.pipe(
-	// 			babel({
-	// 				presets: ['@babel/env'],
-	// 			})
-	// 		)
-	// 		.pipe(sourcemaps.write())
-	// 		.pipe(gulp.dest(config.temp_js_dir));
-	// });
+		return b
+			.bundle()
+			.on('error', function(e) {
+				// console.log(`Browserify error: ${e}`);
+			})
+			.pipe(source('bundle.js'))
+			.pipe(buffer())
+			.pipe(sourcemaps.init())
+			.pipe(
+				babel({
+					presets: ['@babel/env'],
+				})
+			)
+			.pipe(sourcemaps.write())
+			.pipe(gulp.dest(config.temp_js_dir));
+	});
 
 	gulp.task('watchify', function() {
 		let entryFile = path.join(config.src_js_dir, config.src_js_entry_file);
@@ -228,7 +228,7 @@ function gulpDevFn(gulp, config) {
 		const jsWatcher = gulp.watch(
 			config.src_js_dir,
 			// gulp.series('browserify', reload)
-			gulp.series('watchify', reload)
+			gulp.series('browserify', reload)
 		);
 		jsWatcher.on('change', function(filename) {
 			console.log(`File: ${filename} changed!, running tasks ...`);
