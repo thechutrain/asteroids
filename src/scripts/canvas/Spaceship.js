@@ -12,8 +12,8 @@ function Spaceship(gameRef, options) {
 	this.options = defaultOpts || {} || options;
 
 	// this.points = [{ x: 50, y: 50 }, { x: 65, y: 60 }, { x: 50, y: 70 }];
-	this.origin = { x: 50, y: 100 };
-	this.offSet = -20; // degrees
+	this.origin = { x: 250, y: 200 };
+	this.offSet = 0; // degrees
 	this.r = 25;
 
 	this.onScreen = true;
@@ -33,17 +33,20 @@ Spaceship.prototype.calcPoints = function() {
 
 	// Transform origin & angle here:
 
-	// Determin second and third points, relative to origin:
-	let angle2 = this.offSet + 30;
-	let x2 = this.origin.x + Math.sin((Math.PI * angle2) / 180) * h;
-	let y2 = this.origin.y + Math.cos((Math.PI * angle2) / 180) * h;
+	let angle1 = this.offSet;
+	let x1 = this.origin.x - (Math.sin((Math.PI * angle1) / 180) * h) / 2;
+	let y1 = this.origin.y - (Math.cos((Math.PI * angle1) / 180) * h) / 2;
 
-	let angle3 = this.offSet - 30;
-	let x3 = this.origin.x + Math.sin((Math.PI * angle3) / 180) * h;
-	let y3 = this.origin.y + Math.cos((Math.PI * angle3) / 180) * h;
+	let angle2 = this.offSet + 60;
+	let x2 = this.origin.x + (Math.sin((Math.PI * angle2) / 180) * h) / 2;
+	let y2 = this.origin.y + (Math.cos((Math.PI * angle2) / 180) * h) / 2;
+
+	let angle3 = this.offSet - 60;
+	let x3 = this.origin.x + (Math.sin((Math.PI * angle3) / 180) * h) / 2;
+	let y3 = this.origin.y + (Math.cos((Math.PI * angle3) / 180) * h) / 2;
 
 	// Add three points in:
-	this.points.push(this.origin);
+	this.points.push({ x: x1, y: y1 });
 	this.points.push({ x: x2, y: y2 });
 	this.points.push({ x: x3, y: y3 });
 };
