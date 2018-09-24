@@ -3,6 +3,7 @@
 const defaultOpts = {
 	// color: 'black',
 	spacer: 0,
+	maxSpeed: 2,
 };
 
 function Spaceship(gameRef, options) {
@@ -23,7 +24,9 @@ Spaceship.prototype.draw = function(numTicks) {
 	// If throttle is on, move the ship:
 	if (this.blnThrottle) {
 		this.points.forEach(pt => {
+			// pt.x = pt.x + numTicks * this.options.maxSpeed;
 			pt.x = pt.x + 3;
+			pt.y = pt.y - 4;
 		});
 	}
 
@@ -101,19 +104,19 @@ Spaceship.prototype.reset = function() {
 
 	// Determine x-axis adjustments:
 	if (leftBound > xLimit) {
-		adjustXBy =
-			-1 * Math.ceil(rightBound / xLimit) * xLimit + this.options.spacer;
+		// adjustXBy =
+		// 	-1 * Math.ceil(rightBound / xLimit) * xLimit + this.options.spacer;
+		adjustXBy = (rightBound + this.options.spacer) * -1;
 	} else if (rightBound < 0) {
-		adjustXBy = Math.ceil(leftBound / xLimit) * xLimit + this.options.spacer;
+		// adjustXBy = Math.ceil(leftBound / xLimit) * xLimit + this.options.spacer;
+		adjustXBy = Math.abs(leftBound) + xLimit + this.options.spacer;
 	}
 
 	// Determine y-axis adjustments:
 	if (upperBound > yLimit) {
-		adjustYBy =
-			-1 * Math.ceil(upperBound / yLimit) * yLimit + this.options.spacer;
+		adjustYBy = -1 * (lowerBound + this.options.spacer);
 	} else if (lowerBound < 0) {
-		adjustYBy =
-			Math.ceil(Math.abs(upperBound) / yLimit) * yLimit + this.options.spacer;
+		adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
 	}
 
 	// Loop through points:
