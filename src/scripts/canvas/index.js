@@ -57,7 +57,12 @@ Game.prototype.emitEvent = function(event) {
 	switch (event) {
 	case 'ArrowUp':
 		console.log('triggering thrusters');
-		this.spaceship.triggerThrusters();
+		// this.spaceship.triggerThrusters();
+		break;
+	case 'ArrowRight':
+		console.log('rotate right');
+		this.spaceship.offSet += 20;
+		// this.spaceship.move();
 		break;
 	default:
 		console.warn(`Could not process ${event}`);

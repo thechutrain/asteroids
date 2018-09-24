@@ -39,6 +39,8 @@ const documentEventListeners = [
 		cb: function(e) {
 			if (e.key === 'ArrowUp') {
 				window.Game.emitEvent('ArrowUp');
+			} else if (e.key === 'ArrowRight') {
+				window.Game.emitEvent('ArrowRight');
 			}
 		},
 	},
