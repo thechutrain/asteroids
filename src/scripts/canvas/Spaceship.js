@@ -3,7 +3,7 @@
 const defaultOpts = {
 	// color: 'black',
 	spacer: 0,
-	maxSpeed: 7,
+	maxSpeed: 11,
 	minThrust: 2,
 };
 
@@ -26,6 +26,17 @@ function Spaceship(gameRef, options) {
 	this.rotate = false;
 }
 
+Spaceship.prototype.checkSpeed = function() {
+	if (this.thrusters) {
+		if (this.velocity < this.options.minThrust) {
+			this.velocity = 3;
+		} else {
+			this.velocity += 1;
+			this.velocity = Math.min(this.velocity, this.options.maxSpeed);
+		}
+	}
+};
+
 Spaceship.prototype.throttleOn = function() {
 	console.log('THROTTLE ON');
 
@@ -34,23 +45,16 @@ Spaceship.prototype.throttleOn = function() {
 	if (this.throttleTimer) {
 		clearInterval(this.throttleTimer);
 	}
-
-	if (this.velocity < this.options.minThrust) {
-		this.velocity = 3;
-	} else {
-		this.velocity += 1;
-		this.velocity = Math.min(this.velocity, this.options.maxSpeed);
-	}
 };
 
 Spaceship.prototype.throttleOff = function() {
 	console.log('THROTTLE OFFGFFFFFF');
+	this.thrusters = false;
 
 	clearInterval(this.throttleTimer);
 
 	this.throttleTimer = setInterval(
 		function() {
-			this.thrusters = false;
 			this.velocity = this.velocity * 0.75;
 
 			if (this.velocity < 1) {
@@ -63,6 +67,8 @@ Spaceship.prototype.throttleOff = function() {
 };
 
 Spaceship.prototype.calcPoints = function() {
+	this.checkSpeed();
+
 	// Transform origin & angle here:
 	if (this.velocity > 0) {
 		this.origin.x =
