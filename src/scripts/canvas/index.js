@@ -55,9 +55,11 @@ Game.prototype.repaint = function repaint(numTicks) {
 // ================= Game related events ================
 Game.prototype.emitEvent = function(event) {
 	switch (event) {
-	case 'ArrowUp':
-		console.log('triggering thrusters');
-		// this.spaceship.triggerThrusters();
+	case 'throttle-on':
+		this.spaceship.throttleOn();
+		break;
+	case 'throttle-off':
+		this.spaceship.throttleOff();
 		break;
 	case 'ArrowRight':
 		console.log('rotate right');

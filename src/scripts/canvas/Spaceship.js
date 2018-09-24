@@ -3,7 +3,8 @@
 const defaultOpts = {
 	// color: 'black',
 	spacer: 0,
-	maxSpeed: 2,
+	maxSpeed: 7,
+	minThrust: 2,
 };
 
 function Spaceship(gameRef, options) {
@@ -19,27 +20,61 @@ function Spaceship(gameRef, options) {
 	this.onScreen = true;
 
 	// MOVEMENT related properties:
-	this.engineOn = true;
-	// this.blnThrottleOn = false;
+	this.thrusters = false;
 	this.throttleTimer;
-	this.velocity;
+	this.velocity = 0;
 	this.rotate = false;
 }
 
-Spaceship.prototype.calcPoints = function() {
-	const h = 2 * this.r * Math.cos((Math.PI * 30) / 180);
-	this.points = [];
+Spaceship.prototype.throttleOn = function() {
+	console.log('THROTTLE ON');
 
-	// Transform origin & angle here:
-	if (this.engineOn) {
-		let velocity = 5;
-		this.origin.x =
-			this.origin.x - velocity * Math.sin((Math.PI * this.offSet) / 180);
-		this.origin.y =
-			this.origin.y - velocity * Math.cos((Math.PI * this.offSet) / 180);
+	// reset here:
+	this.thrusters = true;
+	if (this.throttleTimer) {
+		clearInterval(this.throttleTimer);
 	}
 
+	if (this.velocity < this.options.minThrust) {
+		this.velocity = 3;
+	} else {
+		this.velocity += 1;
+		this.velocity = Math.min(this.velocity, this.options.maxSpeed);
+	}
+};
+
+Spaceship.prototype.throttleOff = function() {
+	console.log('THROTTLE OFFGFFFFFF');
+
+	clearInterval(this.throttleTimer);
+
+	this.throttleTimer = setInterval(
+		function() {
+			this.thrusters = false;
+			this.velocity = this.velocity * 0.75;
+
+			if (this.velocity < 1) {
+				this.velocity = 0;
+				clearInterval(this.throttleTimer);
+			}
+		}.bind(this),
+		300
+	);
+};
+
+Spaceship.prototype.calcPoints = function() {
+	// Transform origin & angle here:
+	if (this.velocity > 0) {
+		this.origin.x =
+			this.origin.x - this.velocity * Math.sin((Math.PI * this.offSet) / 180);
+		this.origin.y =
+			this.origin.y - this.velocity * Math.cos((Math.PI * this.offSet) / 180);
+	}
+
+	// TODO: convert into a function
 	// Determine 3 points of triangle here:
+	const h = 2 * this.r * Math.cos((Math.PI * 30) / 180);
+
 	let angle1 = this.offSet;
 	let x1 = this.origin.x - (Math.sin((Math.PI * angle1) / 180) * h) / 2;
 	let y1 = this.origin.y - (Math.cos((Math.PI * angle1) / 180) * h) / 2;
@@ -53,6 +88,7 @@ Spaceship.prototype.calcPoints = function() {
 	let y3 = this.origin.y + (Math.cos((Math.PI * angle3) / 180) * h) / 2;
 
 	// Add three points in:
+	this.points = [];
 	this.points.push({ x: x1, y: y1 });
 	this.points.push({ x: x2, y: y2 });
 	this.points.push({ x: x3, y: y3 });

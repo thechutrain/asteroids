@@ -38,11 +38,20 @@ const documentEventListeners = [
 		event: 'keydown',
 		cb: function(e) {
 			if (e.key === 'ArrowUp') {
-				window.Game.emitEvent('ArrowUp');
+				window.Game.emitEvent('throttle-on');
 			} else if (e.key === 'ArrowRight') {
 				window.Game.emitEvent('ArrowRight');
 			} else if (e.key === 'ArrowLeft') {
 				window.Game.emitEvent('ArrowLeft');
+			}
+		},
+	},
+	{
+		event: 'keyup',
+		cb: function(e) {
+			if (e.key === 'ArrowUp') {
+				console.log('Time to dethrottle!');
+				window.Game.emitEvent('throttle-off');
 			}
 		},
 	},
