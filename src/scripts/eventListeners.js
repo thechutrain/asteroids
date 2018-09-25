@@ -37,11 +37,11 @@ const documentEventListeners = [
 	{
 		event: 'keydown',
 		cb: function(e) {
-			if (e.key === 'ArrowUp') {
+			if (e.keyCode === 38) {
 				window.Game.emitEvent('throttle-on');
-			} else if (e.key === 'ArrowRight') {
+			} else if (e.keyCode === 39) {
 				window.Game.emitEvent('ArrowRight');
-			} else if (e.key === 'ArrowLeft') {
+			} else if (e.keyCode === 37) {
 				window.Game.emitEvent('ArrowLeft');
 			}
 		},
@@ -49,7 +49,7 @@ const documentEventListeners = [
 	{
 		event: 'keyup',
 		cb: function(e) {
-			if (e.key === 'ArrowUp') {
+			if (e.keyCode === 38) {
 				console.log('Time to dethrottle!');
 				window.Game.emitEvent('throttle-off');
 			}
@@ -68,6 +68,7 @@ function documentReadyCode(readyFn) {
 		if (listener.selector) {
 			document.querySelectorAll(listener.selector).forEach(ele => {
 				ele.addEventListener(listener.event, listener.cb);
+				console.log('registered' + ele);
 			});
 		} else {
 			// default: add listener to the document
