@@ -40,9 +40,9 @@ const documentEventListeners = [
 			if (e.keyCode === 38) {
 				window.Game.emitEvent('throttle-on');
 			} else if (e.keyCode === 39) {
-				window.Game.emitEvent('ArrowRight');
+				window.Game.emitEvent('right-on');
 			} else if (e.keyCode === 37) {
-				window.Game.emitEvent('ArrowLeft');
+				window.Game.emitEvent('left-on');
 			}
 		},
 	},
@@ -50,8 +50,11 @@ const documentEventListeners = [
 		event: 'keyup',
 		cb: function(e) {
 			if (e.keyCode === 38) {
-				console.log('Time to dethrottle!');
 				window.Game.emitEvent('throttle-off');
+			} else if (e.keyCode === 39) {
+				window.Game.emitEvent('right-off');
+			} else if (e.keyCode === 37) {
+				window.Game.emitEvent('left-off');
 			}
 		},
 	},

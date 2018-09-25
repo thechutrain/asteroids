@@ -62,14 +62,17 @@ Game.prototype.emitEvent = function(event) {
 	case 'throttle-off':
 		this.spaceship.throttleOff();
 		break;
-	case 'ArrowRight':
-		console.log('rotate right');
-		this.spaceship.offSet += 10;
-		// this.spaceship.move();
+	case 'right-on':
+		this.spaceship.turnRight = true;
 		break;
-	case 'ArrowLeft':
-		console.log('rotate left');
-		this.spaceship.offSet -= 10;
+	case 'right-off':
+		this.spaceship.turnRight = false;
+		break;
+	case 'left-on':
+		this.spaceship.turnLeft = true;
+		break;
+	case 'left-off':
+		this.spaceship.turnLeft = false;
 		break;
 	default:
 		console.warn(`Could not process ${event}`);
@@ -111,20 +114,20 @@ Game.prototype.init = function init() {
 
 	window.requestAnimationFrame(this.loop.bind(this));
 
-	this.asteroids.map(
-		function() {
-			return new Promise(function(resolve, reject) {
-				let time = Math.random() * 1000;
-				setTimeout(
-					function() {
-						console.log('created new asteroid');
-						resolve(new Asteroid(this));
-					}.bind(this),
-					time
-				);
-			});
-		}.bind(this)
-	);
+	// this.asteroids.map(
+	// 	function() {
+	// 		return new Promise(function(resolve, reject) {
+	// 			let time = Math.random() * 1000;
+	// 			setTimeout(
+	// 				function() {
+	// 					console.log('created new asteroid');
+	// 					resolve(new Asteroid(this));
+	// 				}.bind(this),
+	// 				time
+	// 			);
+	// 		});
+	// 	}.bind(this)
+	// );
 };
 
 //#region getCanvasElement

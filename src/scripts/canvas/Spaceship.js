@@ -21,6 +21,8 @@ function Spaceship(gameRef, options) {
 
 	// MOVEMENT related properties:
 	this.thrusters = false;
+	this.turnRight = false;
+	this.turnLeft = false;
 	this.throttleTimer;
 	this.velocity = 0;
 	this.rotate = false;
@@ -34,6 +36,15 @@ Spaceship.prototype.checkSpeed = function() {
 			this.velocity += 1;
 			this.velocity = Math.min(this.velocity, this.options.maxSpeed);
 		}
+	}
+
+	// Check if we're turning:
+	if (this.turnRight && this.turnLeft) {
+		this.offSet = this.offSet;
+	} else if (this.turnRight) {
+		this.offSet -= 5;
+	} else if (this.turnLeft) {
+		this.offSet += 5;
 	}
 };
 
