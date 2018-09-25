@@ -7,7 +7,7 @@
 		"test": "jest",
 		"dev": "gulp dev",
 		"build": "gulp build",
-		"publish:surge": "gulp build && surge ./dist asteroids.surge.sh",
+		"publish:surge": "gulp build && surge ./dist asteroid-ship.surge.sh",
 		"publish:gh": ""
 	},
 	"keywords": [

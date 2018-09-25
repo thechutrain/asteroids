@@ -6,6 +6,7 @@ const Spaceship = require('./Spaceship');
 const defaultGameOpts = {
 	tickLength: 50, // ms time in between frames
 	numTicksBeforePausing: 5,
+	maxAsteroids: 5,
 };
 
 function Game(opts) {
@@ -15,7 +16,9 @@ function Game(opts) {
 	this.ctx;
 
 	// Dynamic Properties
-	this.asteroids = [];
+	this.asteroids = Array.apply(null, Array(this.options.maxAsteroids)).map(
+		() => null
+	);
 	this.spaceship;
 
 	this.lastTick = window.performance.now();
@@ -34,11 +37,7 @@ Game.prototype.repaint = function repaint(numTicks) {
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 	// TESTING PURPOSE: add one asteroid here
-	// DEBUGGING - removed asteroid
-	// if (this.asteroids.length === 0) {
-	// 	let asteroid = new Asteroid(this);
-	// 	this.asteroids.push(asteroid);
-	// }
+
 	if (!this.spaceship) {
 		this.spaceship = new Spaceship(this);
 	} else {
@@ -48,25 +47,32 @@ Game.prototype.repaint = function repaint(numTicks) {
 	// CHeck if there are any asteroids
 	// loop through the asteroids
 	this.asteroids.forEach(function(asteroid) {
-		asteroid.draw(numTicks);
+		if (asteroid) {
+			asteroid.draw(numTicks);
+		}
 	});
 };
 
 // ================= Game related events ================
 Game.prototype.emitEvent = function(event) {
 	switch (event) {
-	case 'ArrowUp':
-		console.log('triggering thrusters');
-		// this.spaceship.triggerThrusters();
+	case 'throttle-on':
+		this.spaceship.throttleOn();
 		break;
-	case 'ArrowRight':
-		console.log('rotate right');
-		this.spaceship.offSet += 10;
-		// this.spaceship.move();
+	case 'throttle-off':
+		this.spaceship.throttleOff();
 		break;
-	case 'ArrowLeft':
-		console.log('rotate left');
-		this.spaceship.offSet -= 10;
+	case 'right-on':
+		this.spaceship.turnRight = true;
+		break;
+	case 'right-off':
+		this.spaceship.turnRight = false;
+		break;
+	case 'left-on':
+		this.spaceship.turnLeft = true;
+		break;
+	case 'left-off':
+		this.spaceship.turnLeft = false;
 		break;
 	default:
 		console.warn(`Could not process ${event}`);
@@ -107,6 +113,21 @@ Game.prototype.init = function init() {
 	this.ctx = this.canvasElem.getContext('2d');
 
 	window.requestAnimationFrame(this.loop.bind(this));
+
+	// this.asteroids.map(
+	// 	function() {
+	// 		return new Promise(function(resolve, reject) {
+	// 			let time = Math.random() * 1000;
+	// 			setTimeout(
+	// 				function() {
+	// 					console.log('created new asteroid');
+	// 					resolve(new Asteroid(this));
+	// 				}.bind(this),
+	// 				time
+	// 			);
+	// 		});
+	// 	}.bind(this)
+	// );
 };
 
 //#region getCanvasElement

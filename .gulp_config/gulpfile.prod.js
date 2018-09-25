@@ -87,20 +87,22 @@ function gulpProdFn(gulp, config) {
 			debug: false,
 		});
 
-		return b
-			.bundle()
-			.on('error', function(e) {
-				console.log('Browserify Error');
-			})
-			.pipe(source('bundle.js'))
-			.pipe(buffer())
-			.pipe(
-				babel({
-					presets: ['@babel/env'],
+		return (
+			b
+				.bundle()
+				.on('error', function(e) {
+					console.log('Browserify Error');
 				})
-			)
-			.pipe(uglify())
-			.pipe(gulp.dest(config.dist_js_dir));
+				.pipe(source('bundle.js'))
+				.pipe(buffer())
+				.pipe(
+					babel({
+						presets: ['@babel/env'],
+					})
+				)
+				// .pipe(uglify())
+				.pipe(gulp.dest(config.dist_js_dir))
+		);
 	});
 
 	// ============ DEFAULT PROD TASK =====

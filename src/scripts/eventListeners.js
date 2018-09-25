@@ -37,12 +37,24 @@ const documentEventListeners = [
 	{
 		event: 'keydown',
 		cb: function(e) {
-			if (e.key === 'ArrowUp') {
-				window.Game.emitEvent('ArrowUp');
-			} else if (e.key === 'ArrowRight') {
-				window.Game.emitEvent('ArrowRight');
-			} else if (e.key === 'ArrowLeft') {
-				window.Game.emitEvent('ArrowLeft');
+			if (e.keyCode === 38) {
+				window.Game.emitEvent('throttle-on');
+			} else if (e.keyCode === 39) {
+				window.Game.emitEvent('right-on');
+			} else if (e.keyCode === 37) {
+				window.Game.emitEvent('left-on');
+			}
+		},
+	},
+	{
+		event: 'keyup',
+		cb: function(e) {
+			if (e.keyCode === 38) {
+				window.Game.emitEvent('throttle-off');
+			} else if (e.keyCode === 39) {
+				window.Game.emitEvent('right-off');
+			} else if (e.keyCode === 37) {
+				window.Game.emitEvent('left-off');
 			}
 		},
 	},
@@ -59,6 +71,7 @@ function documentReadyCode(readyFn) {
 		if (listener.selector) {
 			document.querySelectorAll(listener.selector).forEach(ele => {
 				ele.addEventListener(listener.event, listener.cb);
+				console.log('registered' + ele);
 			});
 		} else {
 			// default: add listener to the document
