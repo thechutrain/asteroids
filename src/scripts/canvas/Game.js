@@ -27,7 +27,7 @@ function Game(opts) {
 	this.init();
 }
 
-Game.prototype.repaint = function repaint(numTicks) {
+Game.prototype.paintFrame = function paintFrame(numTicks) {
 	// console.log(numTicks);
 
 	// TEMP: assuming you switch tab or pause:
@@ -41,7 +41,7 @@ Game.prototype.repaint = function repaint(numTicks) {
 	if (!this.spaceship) {
 		this.spaceship = new Spaceship(this);
 	} else {
-		this.spaceship.repaint(numTicks);
+		this.spaceship.paintFrame(numTicks);
 	}
 
 	// CHeck if there are any asteroids
@@ -99,8 +99,8 @@ Game.prototype.loop = function loop(timeStamp) {
 		this.lastRender = timeStamp;
 	}
 
-	// II) Repaint && Update
-	this.repaint(numTicks, timeStamp);
+	// II) paintFrame && Update
+	this.paintFrame(numTicks, timeStamp);
 };
 
 Game.prototype.init = function init() {
@@ -114,12 +114,24 @@ Game.prototype.init = function init() {
 
 	window.requestAnimationFrame(this.loop.bind(this));
 
+	// let updateOne = false;
+	// this.asteroids = this.asteroids.map(
+	// 	function(elem) {
+	// 		if (elem === null && !updateOne) {
+	// 			updateOne = true;
+	// 			debugger;
+	// 			// let time = Math.random() * 1000;
+	// 			return new Asteroid(this);
+	// 		}
+	// 	}.bind(this)
+	// );
 	// this.asteroids.map(
 	// 	function() {
-	// 		return new Promise(function(resolve, reject) {
+	// 		return new Promise(function(resolve) {
 	// 			let time = Math.random() * 1000;
 	// 			setTimeout(
 	// 				function() {
+	// 					debugger;
 	// 					console.log('created new asteroid');
 	// 					resolve(new Asteroid(this));
 	// 				}.bind(this),
