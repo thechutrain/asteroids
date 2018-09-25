@@ -6,6 +6,7 @@ const Spaceship = require('./Spaceship');
 const defaultGameOpts = {
 	tickLength: 50, // ms time in between frames
 	numTicksBeforePausing: 5,
+	maxAsteroids: 5,
 };
 
 function Game(opts) {
@@ -15,7 +16,9 @@ function Game(opts) {
 	this.ctx;
 
 	// Dynamic Properties
-	this.asteroids = [];
+	this.asteroids = Array.apply(null, Array(this.options.maxAsteroids)).map(
+		() => null
+	);
 	this.spaceship;
 
 	this.lastTick = window.performance.now();
@@ -34,11 +37,7 @@ Game.prototype.repaint = function repaint(numTicks) {
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 	// TESTING PURPOSE: add one asteroid here
-	// DEBUGGING - removed asteroid
-	// if (this.asteroids.length === 0) {
-	// 	let asteroid = new Asteroid(this);
-	// 	this.asteroids.push(asteroid);
-	// }
+
 	if (!this.spaceship) {
 		this.spaceship = new Spaceship(this);
 	} else {
@@ -48,7 +47,9 @@ Game.prototype.repaint = function repaint(numTicks) {
 	// CHeck if there are any asteroids
 	// loop through the asteroids
 	this.asteroids.forEach(function(asteroid) {
-		asteroid.draw(numTicks);
+		if (asteroid) {
+			asteroid.draw(numTicks);
+		}
 	});
 };
 
@@ -109,6 +110,21 @@ Game.prototype.init = function init() {
 	this.ctx = this.canvasElem.getContext('2d');
 
 	window.requestAnimationFrame(this.loop.bind(this));
+
+	this.asteroids.map(
+		function() {
+			return new Promise(function(resolve, reject) {
+				let time = Math.random() * 1000;
+				setTimeout(
+					function() {
+						console.log('created new asteroid');
+						resolve(new Asteroid(this));
+					}.bind(this),
+					time
+				);
+			});
+		}.bind(this)
+	);
 };
 
 //#region getCanvasElement
