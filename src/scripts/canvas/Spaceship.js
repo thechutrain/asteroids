@@ -49,8 +49,6 @@ Spaceship.prototype.checkSpeed = function() {
 };
 
 Spaceship.prototype.throttleOn = function() {
-	console.log('THROTTLE ON');
-
 	// reset here:
 	this.thrusters = true;
 	if (this.throttleTimer) {
@@ -59,7 +57,6 @@ Spaceship.prototype.throttleOn = function() {
 };
 
 Spaceship.prototype.throttleOff = function() {
-	console.log('THROTTLE OFFGFFFFFF');
 	this.thrusters = false;
 
 	clearInterval(this.throttleTimer);
@@ -111,7 +108,7 @@ Spaceship.prototype.calcPoints = function() {
 	this.points.push({ x: x3, y: y3 });
 };
 
-Spaceship.prototype.repaint = function(numTicks) {
+Spaceship.prototype.paintFrame = function(numTicks) {
 	// If throttle is on, move the ship:
 	// if (this.blnThrottleOn) {
 	// 	this.points.forEach(pt => {
