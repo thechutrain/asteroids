@@ -21,8 +21,7 @@ function Game(opts) {
 		() => null
 	);
 
-	this.lastTick = window.performance.now();
-	this.lastRender = this.lastTick;
+	this.lastRender = window.performance.now();
 
 	this.init();
 }
@@ -135,7 +134,5 @@ Game.prototype.emitEvent = function(event) {
 		console.warn(`Could not process ${event}`);
 	}
 };
-
-// ============= Utility functions ============
 
 module.exports = exports = Game;
