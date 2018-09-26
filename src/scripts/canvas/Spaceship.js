@@ -16,6 +16,8 @@ function Spaceship(gameRef, options) {
 	this.origin = { x: 250, y: 200 };
 	this.offSet = 0; // degrees offset from pointing 12 oclock
 	this.r = 25;
+	this.prevPoints = [];
+	this.currPoints = [];
 
 	this.onScreen = true; // bln flag to help with reset
 
@@ -55,10 +57,11 @@ Spaceship.prototype.calcPoints = function() {
 	let y3 = this.origin.y + (Math.cos((Math.PI * angle3) / 180) * h) / 2;
 
 	// Add three points in:
-	this.points = [];
-	this.points.push({ x: x1, y: y1 });
-	this.points.push({ x: x2, y: y2 });
-	this.points.push({ x: x3, y: y3 });
+	this.prevPoints = this.currPoints;
+	this.currPoints = [];
+	this.currPoints.push({ x: x1, y: y1 });
+	this.currPoints.push({ x: x2, y: y2 });
+	this.currPoints.push({ x: x3, y: y3 });
 
 	if (!this.onScreen && this.isVisible()) {
 		this.onScreen = true;
@@ -76,7 +79,7 @@ Spaceship.prototype.drawPoints = function() {
 	ctx.save();
 	ctx.fillStyle = 'black';
 	ctx.beginPath();
-	this.points.forEach((pt, i) => {
+	this.currPoints.forEach((pt, i) => {
 		// Draw points:
 		if (i === 0) {
 			ctx.moveTo(pt.x, pt.y);
@@ -92,8 +95,8 @@ Spaceship.prototype.drawPoints = function() {
 	ctx.globalCompositeOperation = 'destination-out';
 	ctx.beginPath();
 	ctx.moveTo(this.origin.x, this.origin.y);
-	ctx.lineTo(this.points[1].x, this.points[1].y);
-	ctx.lineTo(this.points[2].x, this.points[2].y);
+	ctx.lineTo(this.currPoints[1].x, this.currPoints[1].y);
+	ctx.lineTo(this.currPoints[2].x, this.currPoints[2].y);
 	ctx.closePath();
 	ctx.fill();
 	ctx.globalCompositeOperation = 'source-over';
@@ -134,7 +137,7 @@ Spaceship.prototype.reframe = function() {
 	this.origin.x = this.origin.x + adjustXBy;
 	this.origin.y = this.origin.y + adjustYBy;
 
-	this.points.forEach(pt => {
+	this.currPoints.forEach(pt => {
 		pt.x = pt.x + adjustXBy;
 		pt.y = pt.y + adjustYBy;
 	});
@@ -150,7 +153,7 @@ Spaceship.prototype.isVisible = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
 
-	return this.points.every(pt => {
+	return this.currPoints.every(pt => {
 		let { x, y } = pt;
 		return x >= 0 && x <= xLimit && y >= 0 && y <= yLimit;
 	});
@@ -160,7 +163,7 @@ Spaceship.prototype.isHidden = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
 
-	return this.points.every(pt => {
+	return this.currPoints.every(pt => {
 		let { x, y } = pt;
 		return x < 0 || x > xLimit || y < 0 || y > yLimit;
 	});
@@ -168,7 +171,7 @@ Spaceship.prototype.isHidden = function() {
 
 Spaceship.prototype.getBounds = function() {
 	let leftBound, rightBound, upperBound, lowerBound;
-	this.points.forEach((pt, i) => {
+	this.currPoints.forEach((pt, i) => {
 		let { x, y } = pt;
 		if (i === 0) {
 			//Sets default values

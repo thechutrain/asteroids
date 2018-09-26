@@ -17,6 +17,8 @@ function Asteroid(gameRef, options) {
 	this.origin = { x: 150, y: 130 };
 	this.r = 45;
 	this.offSet = 0;
+	this.prevPoints = [];
+	this.currPoints = [];
 
 	this.onScreen = true; // when true, means at least one point is on the canvas
 
@@ -46,14 +48,15 @@ Asteroid.prototype.calcPoints = function calcPoints(ticks) {
 
 	this.offSet += 2;
 
-	this.points = [];
+	this.prevPoints = this.currPoints;
+	this.currPoints = [];
 	let sides = 5;
 	let angleUnit = 360 / sides;
 	for (let i = 0; i < sides; i++) {
 		let angle = angleUnit * i + this.offSet;
 		let newX = this.origin.x + Math.sin((Math.PI * angle) / 180) * this.r;
 		let newY = this.origin.y + Math.cos((Math.PI * angle) / 180) * this.r;
-		this.points.push({ x: newX, y: newY });
+		this.currPoints.push({ x: newX, y: newY });
 	}
 
 	if (!this.onScreen && this.isVisible()) {
@@ -71,7 +74,7 @@ Asteroid.prototype.drawPoints = function drawPoints() {
 	ctx.save();
 	ctx.fillStyle = color;
 	ctx.beginPath();
-	this.points.forEach((pt, i) => {
+	this.currPoints.forEach((pt, i) => {
 		// Draw points:
 		if (i === 0) {
 			ctx.moveTo(pt.x, pt.y);
@@ -128,7 +131,7 @@ Asteroid.prototype.reframe = function reframe() {
 	this.origin.x = this.origin.x + adjustXBy;
 	this.origin.y = this.origin.y + adjustYBy;
 
-	this.points.forEach(pt => {
+	this.currPoints.forEach(pt => {
 		pt.x = pt.x + adjustXBy;
 		pt.y = pt.y + adjustYBy;
 	});
@@ -151,7 +154,7 @@ Asteroid.prototype.isVisible = function() {
 	const yLimit = this.canvasElem.height;
 	// let isVisible = false;
 
-	return this.points.every(pt => {
+	return this.currPoints.every(pt => {
 		let { x, y } = pt;
 		return x >= 0 && x <= xLimit && y >= 0 && y <= yLimit;
 	});
@@ -164,7 +167,7 @@ Asteroid.prototype.isHidden = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
 
-	return this.points.every(pt => {
+	return this.currPoints.every(pt => {
 		let { x, y } = pt;
 		return x < 0 || x > xLimit || y < 0 || y > yLimit;
 	});
@@ -173,7 +176,7 @@ Asteroid.prototype.isHidden = function() {
 
 Asteroid.prototype.getBounds = function() {
 	let leftBound, rightBound, upperBound, lowerBound;
-	this.points.forEach((pt, i) => {
+	this.currPoints.forEach((pt, i) => {
 		let { x, y } = pt;
 		//Set default:
 		if (i === 0) {
