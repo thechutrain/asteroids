@@ -12,20 +12,37 @@ const defaultGameOpts = {
 function Game(opts) {
 	// Static Properties
 	this.options = defaultGameOpts || opts;
-	this.canvasElem = this.getCanvasElement();
+	this.canvasElem = this._getCanvasElement();
 	this.ctx;
 
 	// Dynamic Properties
+	this.spaceship;
 	this.asteroids = Array.apply(null, Array(this.options.maxAsteroids)).map(
 		() => null
 	);
-	this.spaceship;
 
 	this.lastTick = window.performance.now();
 	this.lastRender = this.lastTick;
 
 	this.init();
 }
+
+Game.prototype.init = function init() {
+	if (!this.canvasElem) {
+		console.warn('No Canvas Element');
+		return false;
+	} else {
+		this.ctx = this.canvasElem.getContext('2d');
+	}
+
+	// Create the asteroids:
+	this.asteroids[0] = new Asteroid(this);
+
+	// Create the spaceship:
+
+	// Start looping of our game:
+	window.requestAnimationFrame(this.loop.bind(this));
+};
 
 Game.prototype.paintFrame = function paintFrame(numTicks) {
 	// console.log(numTicks);
@@ -103,47 +120,9 @@ Game.prototype.loop = function loop(timeStamp) {
 	this.paintFrame(numTicks, timeStamp);
 };
 
-Game.prototype.init = function init() {
-	if (!this.canvasElem) {
-		console.warn('No Canvas Element');
-		return;
-	}
-
-	// Set context to be 2D
-	this.ctx = this.canvasElem.getContext('2d');
-
-	window.requestAnimationFrame(this.loop.bind(this));
-
-	// let updateOne = false;
-	// this.asteroids = this.asteroids.map(
-	// 	function(elem) {
-	// 		if (elem === null && !updateOne) {
-	// 			updateOne = true;
-	// 			debugger;
-	// 			// let time = Math.random() * 1000;
-	// 			return new Asteroid(this);
-	// 		}
-	// 	}.bind(this)
-	// );
-	// this.asteroids.map(
-	// 	function() {
-	// 		return new Promise(function(resolve) {
-	// 			let time = Math.random() * 1000;
-	// 			setTimeout(
-	// 				function() {
-	// 					debugger;
-	// 					console.log('created new asteroid');
-	// 					resolve(new Asteroid(this));
-	// 				}.bind(this),
-	// 				time
-	// 			);
-	// 		});
-	// 	}.bind(this)
-	// );
-};
-
+// ============= Utility functions ============
 //#region getCanvasElement
-Game.prototype.getCanvasElement = function getCanvasElement() {
+Game.prototype._getCanvasElement = function getCanvasElement() {
 	const bgCanvas = document.getElementById('bg-canvas');
 
 	// Check for compatibility:
