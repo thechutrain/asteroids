@@ -12,7 +12,7 @@ const defaultGameOpts = {
 function Game(opts) {
 	// Static Properties
 	this.options = defaultGameOpts || opts;
-	this.canvasElem = this._getCanvasElement();
+	this.canvasElem;
 	this.ctx;
 
 	// Dynamic Properties
@@ -28,12 +28,17 @@ function Game(opts) {
 }
 
 Game.prototype.init = function init() {
+	// Get the canvas DOM element:
+	this.canvasElem = document.getElementById('bg-canvas');
 	if (!this.canvasElem) {
-		console.warn('No Canvas Element');
-		return false;
-	} else {
-		this.ctx = this.canvasElem.getContext('2d');
+		console.warn('No canvas element on page');
+		return;
 	}
+
+	// Set canvas size & context:
+	this.canvasElem.width = window.innerWidth;
+	this.canvasElem.height = window.innerHeight;
+	this.ctx = this.canvasElem.getContext('2d');
 
 	// Create spaceship:
 	this.spaceship = new Spaceship(this);
@@ -41,18 +46,46 @@ Game.prototype.init = function init() {
 	// Create the asteroids:
 	this.asteroids[0] = new Asteroid(this);
 
-	// Create the spaceship:
-
 	// Start looping of our game:
 	window.requestAnimationFrame(this.loop.bind(this));
 };
 
-Game.prototype.paintFrame = function paintFrame(numTicks) {
-	// console.log(numTicks);
+/** ============ main loop of game ===========
+ *
+ *
+ */
+Game.prototype.loop = function loop(timeStamp) {
+	// RequestAnimationFrame as first line, good practice as per se MDN
+	window.requestAnimationFrame(this.loop.bind(this));
 
-	// TEMP: assuming you switch tab or pause:
+	const lastRender = this.lastRender;
+	const tickLength = this.options.tickLength;
+	const nextTick = lastRender + tickLength;
+	let numTicks;
+
+	if (timeStamp < nextTick) {
+		// CASE: too early for the next frame, avoid layout thrashing
+		return false;
+	} else {
+		// CASE: enough time has passed since last render & time to update by ticks
+		let timeSinceTick = timeStamp - lastRender;
+		numTicks = Math.floor(timeSinceTick / tickLength);
+		this.lastRender = timeStamp;
+	}
+
+	// TEMP: assume a large numTicks means user switched tab && we're pausing state:
 	if (numTicks > this.options.numTicksBeforePausing) return;
 
+	// GAME LOGIC HERE:
+	// i) calculate points of all objects
+	// ii) look for collisions asteroids w./ spaceship && asteroid w./ bullets
+	// iii) render the updated points & objects:
+	this.calcAllPoints(numTicks);
+	this.processCollisions();
+	this.paintAllFrames(numTicks, timeStamp);
+};
+
+Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 	// Calculate new points for all items:
 	this.spaceship.calcPoints(numTicks);
 	this.asteroids.forEach(asteroid => {
@@ -60,7 +93,11 @@ Game.prototype.paintFrame = function paintFrame(numTicks) {
 			asteroid.calcPoints(numTicks);
 		}
 	});
+};
 
+Game.prototype.processCollisions = function() {};
+
+Game.prototype.paintAllFrames = function paintFrame() {
 	// Clear the box:
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
@@ -71,21 +108,6 @@ Game.prototype.paintFrame = function paintFrame(numTicks) {
 			asteroid.drawPoints();
 		}
 	});
-
-	// PREVIOUS VERSION:
-	// if (!this.spaceship) {
-	// 	this.spaceship = new Spaceship(this);
-	// } else {
-	// 	this.spaceship.paintFrame(numTicks);
-	// }
-
-	// // CHeck if there are any asteroids
-	// // loop through the asteroids
-	// this.asteroids.forEach(function(asteroid) {
-	// 	if (asteroid) {
-	// 		asteroid.draw(numTicks);
-	// 	}
-	// });
 };
 
 // ================= Game related events ================
@@ -114,49 +136,6 @@ Game.prototype.emitEvent = function(event) {
 	}
 };
 
-// ================= initialization & Main thread ===============
-Game.prototype.loop = function loop(timeStamp) {
-	// RequestAnimationFrame as first line, good practice as per se MDN
-	window.requestAnimationFrame(this.loop.bind(this));
-
-	const lastRender = this.lastRender;
-	const { tickLength } = this.options;
-	const nextTick = lastRender + tickLength;
-	let numTicks;
-
-	if (timeStamp < nextTick) {
-		// CASE: too early for the next frame, avoid layout thrashing
-		return false;
-	} else {
-		// CASE: enough time has passed since last render & time to update by ticks
-		let timeSinceTick = timeStamp - lastRender;
-		numTicks = Math.floor(timeSinceTick / tickLength);
-		this.lastRender = timeStamp;
-	}
-
-	// II) paintFrame && Update
-	this.paintFrame(numTicks, timeStamp);
-};
-
 // ============= Utility functions ============
-//#region getCanvasElement
-Game.prototype._getCanvasElement = function getCanvasElement() {
-	const bgCanvas = document.getElementById('bg-canvas');
-
-	// Check for compatibility:
-	if (!bgCanvas) {
-		return false;
-	} else if (!bgCanvas.getContext) {
-		console.warn('canvas getContext not supported!');
-		return false;
-	}
-
-	// Resize canvas:
-	bgCanvas.width = window.innerWidth;
-	bgCanvas.height = window.innerHeight;
-
-	return bgCanvas;
-};
-//#endregion
 
 module.exports = exports = Game;
