@@ -161,26 +161,6 @@ Spaceship.prototype.draw = function() {
 	ctx.globalCompositeOperation = 'source-over';
 };
 
-// Spaceship.prototype.triggerThrusters = function() {
-// 	this.blnThrottleOn = true;
-// 	this.velocity = 5;
-
-// 	if (this.throttleTimer) {
-// 		clearInterval(this.throttleTimer);
-// 	}
-
-// 	this.throttleTimer = setInterval(
-// 		function() {
-// 			this.velocity = this.velocity * 0.8;
-// 			if (this.velocity < 1) {
-// 				this.velocity = 0;
-// 				clearInterval(this.throttleTimer);
-// 			}
-// 		}.bind(this),
-// 		200
-// 	);
-// };
-
 Spaceship.prototype.isVisible = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
