@@ -35,6 +35,9 @@ Game.prototype.init = function init() {
 		this.ctx = this.canvasElem.getContext('2d');
 	}
 
+	// Create spaceship:
+	this.spaceship = new Spaceship(this);
+
 	// Create the asteroids:
 	this.asteroids[0] = new Asteroid(this);
 
@@ -50,24 +53,39 @@ Game.prototype.paintFrame = function paintFrame(numTicks) {
 	// TEMP: assuming you switch tab or pause:
 	if (numTicks > this.options.numTicksBeforePausing) return;
 
+	// Calculate new points for all items:
+	this.spaceship.calcPoints(numTicks);
+	this.asteroids.forEach(asteroid => {
+		if (asteroid) {
+			asteroid.calcPoints(numTicks);
+		}
+	});
+
 	// Clear the box:
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
-	// TESTING PURPOSE: add one asteroid here
-
-	if (!this.spaceship) {
-		this.spaceship = new Spaceship(this);
-	} else {
-		this.spaceship.paintFrame(numTicks);
-	}
-
-	// CHeck if there are any asteroids
-	// loop through the asteroids
-	this.asteroids.forEach(function(asteroid) {
+	// Draw new points for all items:
+	this.spaceship.drawPoints();
+	this.asteroids.forEach(asteroid => {
 		if (asteroid) {
-			asteroid.draw(numTicks);
+			asteroid.drawPoints();
 		}
 	});
+
+	// PREVIOUS VERSION:
+	// if (!this.spaceship) {
+	// 	this.spaceship = new Spaceship(this);
+	// } else {
+	// 	this.spaceship.paintFrame(numTicks);
+	// }
+
+	// // CHeck if there are any asteroids
+	// // loop through the asteroids
+	// this.asteroids.forEach(function(asteroid) {
+	// 	if (asteroid) {
+	// 		asteroid.draw(numTicks);
+	// 	}
+	// });
 };
 
 // ================= Game related events ================
