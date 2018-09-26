@@ -12,14 +12,14 @@ const defaultGameOpts = {
 function Game(opts) {
 	// Static Properties
 	this.options = defaultGameOpts || opts;
-	this.canvasElem = this.getCanvasElement();
+	this.canvasElem = this._getCanvasElement();
 	this.ctx;
 
 	// Dynamic Properties
+	this.spaceship;
 	this.asteroids = Array.apply(null, Array(this.options.maxAsteroids)).map(
 		() => null
 	);
-	this.spaceship;
 
 	this.lastTick = window.performance.now();
 	this.lastRender = this.lastTick;
@@ -27,30 +27,65 @@ function Game(opts) {
 	this.init();
 }
 
-Game.prototype.repaint = function repaint(numTicks) {
+Game.prototype.init = function init() {
+	if (!this.canvasElem) {
+		console.warn('No Canvas Element');
+		return false;
+	} else {
+		this.ctx = this.canvasElem.getContext('2d');
+	}
+
+	// Create spaceship:
+	this.spaceship = new Spaceship(this);
+
+	// Create the asteroids:
+	this.asteroids[0] = new Asteroid(this);
+
+	// Create the spaceship:
+
+	// Start looping of our game:
+	window.requestAnimationFrame(this.loop.bind(this));
+};
+
+Game.prototype.paintFrame = function paintFrame(numTicks) {
 	// console.log(numTicks);
 
 	// TEMP: assuming you switch tab or pause:
 	if (numTicks > this.options.numTicksBeforePausing) return;
 
+	// Calculate new points for all items:
+	this.spaceship.calcPoints(numTicks);
+	this.asteroids.forEach(asteroid => {
+		if (asteroid) {
+			asteroid.calcPoints(numTicks);
+		}
+	});
+
 	// Clear the box:
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
-	// TESTING PURPOSE: add one asteroid here
-
-	if (!this.spaceship) {
-		this.spaceship = new Spaceship(this);
-	} else {
-		this.spaceship.repaint(numTicks);
-	}
-
-	// CHeck if there are any asteroids
-	// loop through the asteroids
-	this.asteroids.forEach(function(asteroid) {
+	// Draw new points for all items:
+	this.spaceship.drawPoints();
+	this.asteroids.forEach(asteroid => {
 		if (asteroid) {
-			asteroid.draw(numTicks);
+			asteroid.drawPoints();
 		}
 	});
+
+	// PREVIOUS VERSION:
+	// if (!this.spaceship) {
+	// 	this.spaceship = new Spaceship(this);
+	// } else {
+	// 	this.spaceship.paintFrame(numTicks);
+	// }
+
+	// // CHeck if there are any asteroids
+	// // loop through the asteroids
+	// this.asteroids.forEach(function(asteroid) {
+	// 	if (asteroid) {
+	// 		asteroid.draw(numTicks);
+	// 	}
+	// });
 };
 
 // ================= Game related events ================
@@ -99,39 +134,13 @@ Game.prototype.loop = function loop(timeStamp) {
 		this.lastRender = timeStamp;
 	}
 
-	// II) Repaint && Update
-	this.repaint(numTicks, timeStamp);
+	// II) paintFrame && Update
+	this.paintFrame(numTicks, timeStamp);
 };
 
-Game.prototype.init = function init() {
-	if (!this.canvasElem) {
-		console.warn('No Canvas Element');
-		return;
-	}
-
-	// Set context to be 2D
-	this.ctx = this.canvasElem.getContext('2d');
-
-	window.requestAnimationFrame(this.loop.bind(this));
-
-	// this.asteroids.map(
-	// 	function() {
-	// 		return new Promise(function(resolve, reject) {
-	// 			let time = Math.random() * 1000;
-	// 			setTimeout(
-	// 				function() {
-	// 					console.log('created new asteroid');
-	// 					resolve(new Asteroid(this));
-	// 				}.bind(this),
-	// 				time
-	// 			);
-	// 		});
-	// 	}.bind(this)
-	// );
-};
-
+// ============= Utility functions ============
 //#region getCanvasElement
-Game.prototype.getCanvasElement = function getCanvasElement() {
+Game.prototype._getCanvasElement = function getCanvasElement() {
 	const bgCanvas = document.getElementById('bg-canvas');
 
 	// Check for compatibility:

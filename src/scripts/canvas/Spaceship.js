@@ -1,10 +1,9 @@
 'use strict';
 
 const defaultOpts = {
-	// color: 'black',
 	spacer: 0,
 	maxSpeed: 11,
-	minThrust: 2,
+	minThrust: 4,
 };
 
 function Spaceship(gameRef, options) {
@@ -12,70 +11,20 @@ function Spaceship(gameRef, options) {
 	this.ctx = gameRef.ctx;
 	this.options = defaultOpts || {} || options;
 
-	// this.points = [{ x: 50, y: 50 }, { x: 65, y: 60 }, { x: 50, y: 70 }];
+	// Position, Orientation, Sizing of Ship:
 	this.origin = { x: 250, y: 200 };
-	this.offSet = 0; // degrees
+	this.offSet = 0; // degrees offset from pointing 12 oclock
 	this.r = 25;
 
-	this.onScreen = true;
+	this.onScreen = true; // bln flag to help with reset
 
-	// MOVEMENT related properties:
+	// Current movement properties:
 	this.thrusters = false;
 	this.turnRight = false;
 	this.turnLeft = false;
 	this.throttleTimer;
 	this.velocity = 0;
-	this.rotate = false;
 }
-
-Spaceship.prototype.checkSpeed = function() {
-	if (this.thrusters) {
-		if (this.velocity < this.options.minThrust) {
-			this.velocity = 3;
-		} else {
-			this.velocity += 1;
-			this.velocity = Math.min(this.velocity, this.options.maxSpeed);
-		}
-	}
-
-	// Check if we're turning:
-	if (this.turnRight && this.turnLeft) {
-		this.offSet = this.offSet;
-	} else if (this.turnRight) {
-		this.offSet -= 5;
-	} else if (this.turnLeft) {
-		this.offSet += 5;
-	}
-};
-
-Spaceship.prototype.throttleOn = function() {
-	console.log('THROTTLE ON');
-
-	// reset here:
-	this.thrusters = true;
-	if (this.throttleTimer) {
-		clearInterval(this.throttleTimer);
-	}
-};
-
-Spaceship.prototype.throttleOff = function() {
-	console.log('THROTTLE OFFGFFFFFF');
-	this.thrusters = false;
-
-	clearInterval(this.throttleTimer);
-
-	this.throttleTimer = setInterval(
-		function() {
-			this.velocity = this.velocity * 0.75;
-
-			if (this.velocity < 1) {
-				this.velocity = 0;
-				clearInterval(this.throttleTimer);
-			}
-		}.bind(this),
-		300
-	);
-};
 
 Spaceship.prototype.calcPoints = function() {
 	this.checkSpeed();
@@ -109,32 +58,16 @@ Spaceship.prototype.calcPoints = function() {
 	this.points.push({ x: x1, y: y1 });
 	this.points.push({ x: x2, y: y2 });
 	this.points.push({ x: x3, y: y3 });
-};
-
-Spaceship.prototype.repaint = function(numTicks) {
-	// If throttle is on, move the ship:
-	// if (this.blnThrottleOn) {
-	// 	this.points.forEach(pt => {
-	// 		pt.x = pt.x + this.velocity * numTicks;
-	// 		// pt.x = pt.x + numTicks * this.options.maxSpeed;
-	// 		// pt.y = pt.y - 4 * numTicks;
-	// 	});
-	// }
-
-	this.calcPoints();
-
-	this.draw();
 
 	if (!this.onScreen && this.isVisible()) {
-		this.onScreen = this;
+		this.onScreen = true;
 	} else if (this.isHidden()) {
 		this.onScreen = false;
-
-		this.reset();
+		this.reframe();
 	}
 };
 
-Spaceship.prototype.draw = function() {
+Spaceship.prototype.drawPoints = function() {
 	const ctx = this.ctx;
 
 	// Draw the main triangle
@@ -165,26 +98,53 @@ Spaceship.prototype.draw = function() {
 	ctx.globalCompositeOperation = 'source-over';
 };
 
-// Spaceship.prototype.triggerThrusters = function() {
-// 	this.blnThrottleOn = true;
-// 	this.velocity = 5;
+Spaceship.prototype.paintFrame = function() {
+	this.calcPoints();
+	this.drawPoints();
+};
 
-// 	if (this.throttleTimer) {
-// 		clearInterval(this.throttleTimer);
-// 	}
+Spaceship.prototype.reframe = function() {
+	const xLimit = this.canvasElem.width;
+	const yLimit = this.canvasElem.height;
+	let adjustXBy = 0;
+	let adjustYBy = 0;
 
-// 	this.throttleTimer = setInterval(
-// 		function() {
-// 			this.velocity = this.velocity * 0.8;
-// 			if (this.velocity < 1) {
-// 				this.velocity = 0;
-// 				clearInterval(this.throttleTimer);
-// 			}
-// 		}.bind(this),
-// 		200
-// 	);
-// };
+	// Determine left, right, top, bottom bounds of our shape:
+	const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
 
+	// Determine x-axis adjustments:
+	if (leftBound > xLimit) {
+		// adjustXBy =
+		// 	-1 * Math.ceil(rightBound / xLimit) * xLimit + this.options.spacer;
+		adjustXBy = (rightBound + this.options.spacer) * -1;
+	} else if (rightBound < 0) {
+		// adjustXBy = Math.ceil(leftBound / xLimit) * xLimit + this.options.spacer;
+		adjustXBy = Math.abs(leftBound) + xLimit + this.options.spacer;
+	}
+
+	// Determine y-axis adjustments:
+	if (upperBound > yLimit) {
+		adjustYBy = -1 * (lowerBound + this.options.spacer);
+	} else if (lowerBound < 0) {
+		adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
+	}
+
+	// Update the origin & drawn out points:
+	this.origin.x = this.origin.x + adjustXBy;
+	this.origin.y = this.origin.y + adjustYBy;
+
+	this.points.forEach(pt => {
+		pt.x = pt.x + adjustXBy;
+		pt.y = pt.y + adjustYBy;
+	});
+};
+/** ======== utility functions ========
+ *
+ * isVisible() : returns true if the entire shape is visible
+ * isHidden() : returns true if the entire shape is hidden
+ * getBounds() : returns { leftBound, rightBound, upperBound, lowerBound}
+ */
+//#region utility functions
 Spaceship.prototype.isVisible = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
@@ -223,36 +183,60 @@ Spaceship.prototype.getBounds = function() {
 
 	return { leftBound, rightBound, upperBound, lowerBound };
 };
+//#endregion utility functions
 
-Spaceship.prototype.reset = function() {
-	const xLimit = this.canvasElem.width;
-	const yLimit = this.canvasElem.height;
-	let adjustXBy = 0;
-	let adjustYBy = 0;
-
-	// Determine left, right, top, bottom bounds of our shape:
-	const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
-
-	// Determine x-axis adjustments:
-	if (leftBound > xLimit) {
-		// adjustXBy =
-		// 	-1 * Math.ceil(rightBound / xLimit) * xLimit + this.options.spacer;
-		adjustXBy = (rightBound + this.options.spacer) * -1;
-	} else if (rightBound < 0) {
-		// adjustXBy = Math.ceil(leftBound / xLimit) * xLimit + this.options.spacer;
-		adjustXBy = Math.abs(leftBound) + xLimit + this.options.spacer;
+/** ======== Speed related functions ========
+ *
+ * checkSpeed() : adjusts velocity of spaceship
+ * throttleOn() : turns thrusters on (continues until explicitly turned off)
+ * throttleOff() : explicitly turns thursters off
+ */
+//#region speed related functions
+Spaceship.prototype.checkSpeed = function() {
+	if (this.thrusters) {
+		if (this.velocity < this.options.minThrust) {
+			this.velocity = this.options.minThrust;
+		} else {
+			this.velocity += 1;
+			this.velocity = Math.min(this.velocity, this.options.maxSpeed);
+		}
 	}
 
-	// Determine y-axis adjustments:
-	if (upperBound > yLimit) {
-		adjustYBy = -1 * (lowerBound + this.options.spacer);
-	} else if (lowerBound < 0) {
-		adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
+	// Check if we're turning:
+	if (this.turnRight && this.turnLeft) {
+		this.offSet = this.offSet;
+	} else if (this.turnRight) {
+		this.offSet -= 5;
+	} else if (this.turnLeft) {
+		this.offSet += 5;
 	}
-
-	// Loop through points:
-	this.origin.x = this.origin.x + adjustXBy;
-	this.origin.y = this.origin.y + adjustYBy;
 };
+
+Spaceship.prototype.throttleOn = function() {
+	// reset here:
+	this.thrusters = true;
+	if (this.throttleTimer) {
+		clearInterval(this.throttleTimer);
+	}
+};
+
+Spaceship.prototype.throttleOff = function() {
+	this.thrusters = false;
+
+	clearInterval(this.throttleTimer);
+
+	this.throttleTimer = setInterval(
+		function() {
+			this.velocity = this.velocity * 0.75;
+
+			if (this.velocity < 1) {
+				this.velocity = 0;
+				clearInterval(this.throttleTimer);
+			}
+		}.bind(this),
+		300
+	);
+};
+//#endregion speed related functionality
 
 module.exports = Spaceship;
