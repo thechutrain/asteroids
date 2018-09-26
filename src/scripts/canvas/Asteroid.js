@@ -30,9 +30,6 @@ function Asteroid(gameRef, options) {
 }
 
 Asteroid.prototype.init = function() {
-	// GENERATE RANDOM DIRECTION & SPEED
-	// if (this.options)
-	// debugger;
 	const xUpperSpeedBound = 3;
 	const xLowerSpeedBound = -1;
 	this.options.translateX = Math.floor(

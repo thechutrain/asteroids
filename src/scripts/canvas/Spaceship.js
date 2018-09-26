@@ -4,7 +4,7 @@ const defaultOpts = {
 	// color: 'black',
 	spacer: 0,
 	maxSpeed: 11,
-	minThrust: 2,
+	minThrust: 4,
 };
 
 function Spaceship(gameRef, options) {
@@ -12,26 +12,25 @@ function Spaceship(gameRef, options) {
 	this.ctx = gameRef.ctx;
 	this.options = defaultOpts || {} || options;
 
-	// this.points = [{ x: 50, y: 50 }, { x: 65, y: 60 }, { x: 50, y: 70 }];
+	// Position, Orientation, Sizing of Ship:
 	this.origin = { x: 250, y: 200 };
-	this.offSet = 0; // degrees
+	this.offSet = 0; // degrees offset from pointing 12 oclock
 	this.r = 25;
 
-	this.onScreen = true;
+	this.onScreen = true; // bln flag to help with reset
 
-	// MOVEMENT related properties:
+	// Current movement properties:
 	this.thrusters = false;
 	this.turnRight = false;
 	this.turnLeft = false;
 	this.throttleTimer;
 	this.velocity = 0;
-	this.rotate = false;
 }
 
 Spaceship.prototype.checkSpeed = function() {
 	if (this.thrusters) {
 		if (this.velocity < this.options.minThrust) {
-			this.velocity = 3;
+			this.velocity = this.options.minThrust;
 		} else {
 			this.velocity += 1;
 			this.velocity = Math.min(this.velocity, this.options.maxSpeed);
