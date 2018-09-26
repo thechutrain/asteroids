@@ -3,8 +3,8 @@
 const defaultOpts = {
 	color: 'rgba(48, 128, 232, 0.6)',
 	animate: true,
-	translateX: -2,
-	translateY: -3,
+	translateX: 2,
+	translateY: 0,
 	spacer: 1, // additional padding space added when calculating off frame reset
 };
 
@@ -24,6 +24,10 @@ function Asteroid(gameRef, options) {
 		{ x: 0, y: 17 },
 		{ x: 0, y: 7 },
 	];
+	this.origin = { x: 150, y: 130 };
+	this.r = 45;
+	this.offSet = 0;
+
 	this.onScreen = true; // when true, means at least one point is on the canvas
 
 	this.init();
@@ -47,10 +51,25 @@ Asteroid.prototype.calcPoints = function calcPoints(ticks) {
 	const moveXBy = ticks * translateX;
 	const moveYBy = ticks * translateY;
 
-	this.points.forEach(pt => {
-		pt.x = pt.x + moveXBy;
-		pt.y = pt.y + moveYBy;
-	});
+	this.origin.x = this.origin.x + moveXBy;
+	this.origin.y = this.origin.y + moveYBy;
+
+	this.offSet += 2;
+
+	this.points = [];
+	let sides = 5;
+	let angleUnit = 360 / sides;
+	for (let i = 0; i < sides; i++) {
+		let angle = angleUnit * i + this.offSet;
+		let newX = this.origin.x + Math.sin((Math.PI * angle) / 180) * this.r;
+		let newY = this.origin.y + Math.cos((Math.PI * angle) / 180) * this.r;
+		this.points.push({ x: newX, y: newY });
+	}
+
+	// this.points.forEach(pt => {
+	// 	pt.x = pt.x + moveXBy;
+	// 	pt.y = pt.y + moveYBy;
+	// });
 
 	if (!this.onScreen && this.isVisible()) {
 		this.onScreen = true;
