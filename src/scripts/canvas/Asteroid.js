@@ -3,8 +3,8 @@
 const defaultOpts = {
 	color: 'rgba(48, 128, 232, 0.6)',
 	animate: true,
-	translateX: 2,
-	translateY: 0,
+	translateX: 3,
+	translateY: 2,
 	spacer: 1, // additional padding space added when calculating off frame reset
 };
 
@@ -14,16 +14,6 @@ function Asteroid(gameRef, options) {
 	this.canvasElem = gameRef.canvasElem;
 	this.ctx = gameRef.ctx; // reference to the context
 
-	this.points = [
-		{ x: 7, y: 0 },
-		{ x: 17, y: 0 },
-		{ x: 24, y: 7 },
-		{ x: 24, y: 17 },
-		{ x: 17, y: 24 },
-		{ x: 7, y: 24 },
-		{ x: 0, y: 17 },
-		{ x: 0, y: 7 },
-	];
 	this.origin = { x: 150, y: 130 };
 	this.r = 45;
 	this.offSet = 0;
@@ -66,11 +56,6 @@ Asteroid.prototype.calcPoints = function calcPoints(ticks) {
 		this.points.push({ x: newX, y: newY });
 	}
 
-	// this.points.forEach(pt => {
-	// 	pt.x = pt.x + moveXBy;
-	// 	pt.y = pt.y + moveYBy;
-	// });
-
 	if (!this.onScreen && this.isVisible()) {
 		this.onScreen = true;
 	} else if (this.isHidden()) {
@@ -102,6 +87,8 @@ Asteroid.prototype.drawPoints = function drawPoints() {
 Asteroid.prototype.reframe = function reframe() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
+	let adjustXBy = 0;
+	let adjustYBy = 0;
 
 	// Determine left, right, top, bottom bounds of our shape:
 	const { leftBound, rightBound, upperBound, lowerBound } = this.getBounds();
@@ -112,22 +99,14 @@ Asteroid.prototype.reframe = function reframe() {
 		// Check to see if the trailing edge (far left x-coord on shape) is off screen
 		if (leftBound > xLimit) {
 			// then adjust all the x-coordinates
-			let adjustXBy = rightBound + this.options.spacer;
-
-			this.points.forEach(pt => {
-				pt.x = pt.x - adjustXBy;
-			});
+			adjustXBy = -1 * (rightBound + this.options.spacer);
 		}
 	} else {
 		// CASE: moving left
 		// checkt to see if shape may be off the canvas on the left-side
 		if (rightBound < 0) {
 			// all x-coordinates are off the screen & we need to update
-			let adjustXBy = Math.abs(leftBound) + xLimit + this.options.spacer;
-
-			this.points.forEach(pt => {
-				pt.x = pt.x + adjustXBy;
-			});
+			adjustXBy = Math.abs(leftBound) + xLimit + this.options.spacer;
 		}
 	}
 
@@ -136,23 +115,23 @@ Asteroid.prototype.reframe = function reframe() {
 	if (this.options.translateY > 0) {
 		// Case: moving down, could potentially be below canvas
 		if (upperBound > yLimit) {
-			let adjustYBy = lowerBound + this.options.spacer;
-
-			this.points.forEach(pt => {
-				pt.y = pt.y - adjustYBy;
-			});
+			adjustYBy = -1 * (lowerBound + this.options.spacer);
 		}
 	} else {
 		// Case; moving up
 		// check if the entire shape is above the canvas
 		if (lowerBound < 0) {
-			let adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
-
-			this.points.forEach(pt => {
-				pt.y = pt.y + adjustYBy;
-			});
+			adjustYBy = Math.abs(upperBound) + yLimit + this.options.spacer;
 		}
 	}
+
+	this.origin.x = this.origin.x + adjustXBy;
+	this.origin.y = this.origin.y + adjustYBy;
+
+	this.points.forEach(pt => {
+		pt.x = pt.x + adjustXBy;
+		pt.y = pt.y + adjustYBy;
+	});
 };
 
 // ========= Visibility utility functions ==========
