@@ -4,6 +4,7 @@ const defaultOpts = {
 	spacer: 0,
 	maxSpeed: 11,
 	minThrust: 4,
+	rotationSpeed: 8,
 };
 
 function Spaceship(gameRef, options) {
@@ -206,9 +207,9 @@ Spaceship.prototype.checkSpeed = function() {
 	if (this.turnRight && this.turnLeft) {
 		this.offSet = this.offSet;
 	} else if (this.turnRight) {
-		this.offSet -= 5;
+		this.offSet -= this.options.rotationSpeed;
 	} else if (this.turnLeft) {
-		this.offSet += 5;
+		this.offSet += this.options.rotationSpeed;
 	}
 };
 
