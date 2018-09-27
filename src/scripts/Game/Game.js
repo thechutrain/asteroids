@@ -49,10 +49,7 @@ Game.prototype.init = function init() {
 	window.requestAnimationFrame(this.loop.bind(this));
 };
 
-/** ============ main loop of game ===========
- *
- *
- */
+// ============ main loop of game ===========
 Game.prototype.loop = function loop(timeStamp) {
 	// RequestAnimationFrame as first line, good practice as per se MDN
 	window.requestAnimationFrame(this.loop.bind(this));
@@ -78,11 +75,11 @@ Game.prototype.loop = function loop(timeStamp) {
 	// GAME LOGIC HERE:
 	// i) calculate points of all objects
 	this.calcAllPoints(numTicks);
-	
+
 	//TODO:
 	// ii) look for collisions asteroids w./ spaceship && asteroid w./ bullets
 	this.processCollisions();
-	
+
 	// iii) render the updated points & objects:
 	this.paintAllFrames(numTicks, timeStamp);
 };
