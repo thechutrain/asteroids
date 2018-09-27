@@ -51,7 +51,7 @@ Asteroid.prototype.calcPoints = function calcPoints(ticks) {
 
 	this.prevPoints = this.currPoints;
 	this.currPoints = [];
-	let sides = 5;
+	let sides = 8;
 	let angleUnit = 360 / sides;
 	for (let i = 0; i < sides; i++) {
 		let angle = angleUnit * i + this.offSet;

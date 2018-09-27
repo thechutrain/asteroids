@@ -77,10 +77,13 @@ Game.prototype.loop = function loop(timeStamp) {
 
 	// GAME LOGIC HERE:
 	// i) calculate points of all objects
-	// ii) look for collisions asteroids w./ spaceship && asteroid w./ bullets
-	// iii) render the updated points & objects:
 	this.calcAllPoints(numTicks);
+	
+	//TODO:
+	// ii) look for collisions asteroids w./ spaceship && asteroid w./ bullets
 	this.processCollisions();
+	
+	// iii) render the updated points & objects:
 	this.paintAllFrames(numTicks, timeStamp);
 };
 

@@ -16,7 +16,7 @@ registerWindowEventListeners();
 registerDocumentEventListeners(main);
 
 // ==================== Register Event Listeners ====================
-const Game = require('./canvas/Game');
+const Game = require('./Game/Game');
 
 console.log('starting game ...');
 
