@@ -130,6 +130,12 @@ Game.prototype.emitEvent = function(event) {
 	case 'left-off':
 		this.spaceship.turnLeft = false;
 		break;
+	case 'fire-on':
+		console.log('firing!');
+		break;
+	case 'fire-off':
+		console.log('stop firing');
+		break;
 	default:
 		console.warn(`Could not process ${event}`);
 	}

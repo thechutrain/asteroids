@@ -43,6 +43,8 @@ const documentEventListeners = [
 				window.Game.emitEvent('right-on');
 			} else if (e.keyCode === 37) {
 				window.Game.emitEvent('left-on');
+			} else if (e.keyCode === 32) {
+				window.Game.emitEvent('fire-on');
 			}
 		},
 	},
@@ -55,6 +57,8 @@ const documentEventListeners = [
 				window.Game.emitEvent('right-off');
 			} else if (e.keyCode === 37) {
 				window.Game.emitEvent('left-off');
+			} else if (e.keyCode === 32) {
+				window.Game.emitEvent('fire-off');
 			}
 		},
 	},
