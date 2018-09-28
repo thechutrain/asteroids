@@ -94,8 +94,15 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 			asteroid.calcPoints(numTicks);
 		}
 	});
-	this.bullets.forEach(bullet => {
-		bullet.calcPoints();
+	// this.bullets.forEach(bullet => {
+	// 	bullet.calcPoints();
+	// });
+	this.bullets = this.bullets.filter(bullet => {
+		if (!bullet.isActive) {
+			return false;
+		} else {
+			return bullet.calcPoints();
+		}
 	});
 };
 
@@ -139,7 +146,6 @@ Game.prototype.emitEvent = function(event) {
 		this.spaceship.turnLeft = false;
 		break;
 	case 'fire-on':
-		console.log('firing!');
 		var origin = this.spaceship.currPoints[0];
 		var offSet = this.spaceship.offSet;
 		this.bullets.push(new Bullet(this, origin, offSet));
