@@ -45,6 +45,8 @@ const documentEventListeners = [
 				window.Game.emitEvent('left-on');
 			} else if (e.keyCode === 32) {
 				window.Game.emitEvent('fire-on');
+			} else if (e.keyCode === 80) {
+				window.Game.emitEvent('toggle-pause');
 			}
 		},
 	},

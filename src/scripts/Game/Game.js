@@ -23,6 +23,7 @@ function Game(opts) {
 		() => null
 	);
 
+	this.isActive = true; // whether the game is active or not
 	this.lastRender = window.performance.now();
 
 	this.init();
@@ -52,7 +53,9 @@ Game.prototype.init = function init() {
 };
 
 // ============ main loop of game ===========
-Game.prototype.loop = function loop(timeStamp) {
+Game.prototype.loop = function loop(timeStamp = this.lastRender) {
+	if (!this.isActive) return;
+
 	// RequestAnimationFrame as first line, good practice as per se MDN
 	window.requestAnimationFrame(this.loop.bind(this));
 
@@ -60,6 +63,7 @@ Game.prototype.loop = function loop(timeStamp) {
 	const tickLength = this.options.tickLength;
 	const nextTick = lastRender + tickLength;
 	let numTicks;
+	// let timeStamp = timeStamp || this.lastRender; //
 
 	if (timeStamp < nextTick) {
 		// CASE: too early for the next frame, avoid layout thrashing
@@ -94,9 +98,6 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 			asteroid.calcPoints(numTicks);
 		}
 	});
-	// this.bullets.forEach(bullet => {
-	// 	bullet.calcPoints();
-	// });
 	this.bullets = this.bullets.filter(bullet => {
 		if (!bullet.isActive) {
 			return false;
@@ -170,6 +171,12 @@ Game.prototype.emitEvent = function(event) {
 		break;
 	case 'fire-off':
 		console.log('stop firing');
+		break;
+	case 'toggle-pause':
+		this.isActive = !this.isActive;
+		if (this.isActive) {
+			this.loop();
+		}
 		break;
 	default:
 		console.warn(`Could not process ${event}`);

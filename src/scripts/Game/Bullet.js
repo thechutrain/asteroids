@@ -2,7 +2,7 @@ function Bullet(gameRef, origin, offSet) {
 	this.canvasElem = gameRef.canvasElem;
 	this.ctx = gameRef.ctx;
 	this.offSet = offSet;
-	this.velocity = 5;
+	this.velocity = 10;
 	this.maxDistance = 500;
 
 	this.isActive = true;
