@@ -2,6 +2,7 @@
 
 const Asteroid = require('./Asteroid');
 const Spaceship = require('./Spaceship');
+const Bullet = require('./Bullet');
 
 const defaultGameOpts = {
 	tickLength: 50, // ms time in between frames
@@ -16,6 +17,7 @@ function Game(opts) {
 	this.ctx;
 
 	// Dynamic Properties
+	this.bullets = [];
 	this.spaceship;
 	this.asteroids = Array.apply(null, Array(this.options.maxAsteroids)).map(
 		() => null
@@ -92,6 +94,9 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 			asteroid.calcPoints(numTicks);
 		}
 	});
+	this.bullets.forEach(bullet => {
+		bullet.calcPoints();
+	});
 };
 
 Game.prototype.processCollisions = function() {};
@@ -106,6 +111,9 @@ Game.prototype.paintAllFrames = function paintFrame() {
 		if (asteroid) {
 			asteroid.drawPoints();
 		}
+	});
+	this.bullets.forEach(bullet => {
+		bullet.drawPoints();
 	});
 };
 
@@ -132,6 +140,9 @@ Game.prototype.emitEvent = function(event) {
 		break;
 	case 'fire-on':
 		console.log('firing!');
+		var origin = this.spaceship.currPoints[0];
+		var offSet = this.spaceship.offSet;
+		this.bullets.push(new Bullet(this, origin, offSet));
 		break;
 	case 'fire-off':
 		console.log('stop firing');
