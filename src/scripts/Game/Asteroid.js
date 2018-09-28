@@ -21,6 +21,7 @@ function Asteroid(gameRef, options) {
 	this.currPoints = [];
 
 	this.onScreen = true; // when true, means at least one point is on the canvas
+	this.isActive = true; // determines if its been hit or not
 
 	this.init();
 }
@@ -196,14 +197,92 @@ Asteroid.prototype.getBounds = function() {
 	return { leftBound, rightBound, upperBound, lowerBound };
 };
 
-function triangleContains(triCoord, ptCoord) {
-	const { leftBound, rightBound, upperBound, lowerBound } = getBounds(triCoord);
+Asteroid.prototype.containsPoint = function containsPoint(ptCoord) {
+	const { leftBound, rightBound, upperBound, lowerBound } = getBounds(
+		this.currPoints
+	);
 
-	if (ptCoord.x < leftBound || ptCoord.x > rightBound) {
-		return false;
-	} else if (ptCoord.y < upperBound || ptCoord.y > lowerBound) {
+	// Make sure the pt of interest is contained within its bounds:
+	//TODO: should save this as a property of the asteroids object, instead of recalculating?? cache value
+	if (
+		ptCoord.x < leftBound ||
+		ptCoord.x > rightBound ||
+		ptCoord.y < upperBound ||
+		ptCoord.y > lowerBound
+	) {
 		return false;
 	}
+
+	let isOnLine = false; // bln flag to check if its on the line, then containsPoints ==> true!
+	const lineResults = this.currPoints.map((pt1, index, coordArr) => {
+		const x1 = pt1.x;
+		const y1 = pt1.y;
+		const x2 =
+			index + 1 < coordArr.length ? coordArr[index + 1].x : coordArr[0].x;
+		const y2 =
+			index + 1 < coordArr.length ? coordArr[index + 1].y : coordArr[0].y;
+		const m = (y1 - y2) / (x1 - x2);
+		const b = y1 - m * x1;
+
+		// Edge Case: slope is a vertical line
+		if (m === Infinity) {
+			if (ptCoord.x === x1) {
+				isOnLine = true;
+				return true; // this really doesn't matter
+			}
+			return ptCoord.x < x1;
+		} else {
+			if (ptCoord.y === m * ptCoord.x + b) {
+				isOnLine = true;
+				return true; // this really doesn't matter
+			}
+			return ptCoord.y < m * ptCoord.x + b;
+		}
+	});
+
+	if (isOnLine) {
+		return true;
+	} else {
+		// check how many lines it was below
+		let numLinesBelow = 0;
+		let shouldEqual = Math.ceil(lineResults.length / 2);
+		lineResults.forEach(res => {
+			if (res) {
+				numLinesBelow++;
+			}
+		});
+
+		return numLinesBelow === shouldEqual;
+	}
+
+	// Refactor so its more general?
+	function getBounds(coordArr) {
+		let leftBound, rightBound, upperBound, lowerBound;
+		coordArr.forEach((pt, i) => {
+			let { x, y } = pt;
+			if (i === 0) {
+				//Sets default values
+				leftBound = rightBound = x;
+				upperBound = lowerBound = y;
+			} else {
+				leftBound = Math.min(leftBound, x);
+				rightBound = Math.max(rightBound, x);
+				upperBound = Math.min(upperBound, y);
+				lowerBound = Math.max(lowerBound, y);
+			}
+		});
+		return { leftBound, rightBound, upperBound, lowerBound };
+	}
+};
+
+function triangleContains(triCoord, ptCoord) {
+	// const { leftBound, rightBound, upperBound, lowerBound } = getBounds(triCoord);
+
+	// if (ptCoord.x < leftBound || ptCoord.x > rightBound) {
+	// 	return false;
+	// } else if (ptCoord.y < upperBound || ptCoord.y > lowerBound) {
+	// 	return false;
+	// }
 
 	// Returns an array of bln values of whether the pt is below a generated line or not
 	const lineResults = triCoord.map((pt1, index, coordArr) => {

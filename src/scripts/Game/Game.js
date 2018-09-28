@@ -106,7 +106,25 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 	});
 };
 
-Game.prototype.processCollisions = function() {};
+Game.prototype.processCollisions = function() {
+	let bullets = this.bullets;
+	this.asteroids = this.asteroids.filter(asteroid => {
+		if (asteroid === null) {
+			return true;
+		}
+		// loop through each bullet & check if asteroid contains that bullet
+		for (let i = 0; i < bullets.length; i++) {
+			let bulletPt = bullets[i].origin;
+			if (asteroid.containsPoint(bulletPt)) {
+				console.log('Hit the asteroid!!!');
+				asteroid.isActive = false;
+				bullets[i].isActive = false;
+			}
+		}
+
+		return asteroid.isActive;
+	});
+};
 
 Game.prototype.paintAllFrames = function paintFrame() {
 	// Clear the box:
