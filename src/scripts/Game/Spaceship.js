@@ -27,6 +27,9 @@ function Spaceship(gameRef, options) {
 	this.turnLeft = false;
 	this.throttleTimer;
 	this.velocity = 0;
+
+	// Init(): ensures currPoints are available at object creation
+	this.calcPoints();
 }
 
 Spaceship.prototype.calcPoints = function() {

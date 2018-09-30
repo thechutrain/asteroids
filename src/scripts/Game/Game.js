@@ -8,6 +8,7 @@ const defaultGameOpts = {
 	tickLength: 50, // ms time in between frames
 	numTicksBeforePausing: 5,
 	maxAsteroids: 5,
+	asteroidDelay: 3 * 1000,
 };
 
 function Game(opts) {
@@ -20,6 +21,7 @@ function Game(opts) {
 	this.bullets = [];
 	this.spaceship;
 	this.asteroids = [];
+	this.isFiring = false;
 
 	this.isActive = true; // whether the game is active or not
 	this.lastRender = window.performance.now();
@@ -77,8 +79,10 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 	// note: assume a large numTicks means user switched tab && we're pausing state:
 	if (numTicks > this.options.numTicksBeforePausing) return;
 
-	// Create additional asteroids etc.
+	// Create additional asteroids etc. (if possible)
 	this.makeAsteroid();
+
+	this.fireBullet();
 
 	// GAME LOGIC HERE:
 	// i) calculate points of all objects
@@ -155,10 +159,18 @@ Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 					console.log('resetting timeout');
 					timerRef = null;
 					canMakeAsteroid = true;
-				}, 3000);
+				}, this.options.asteroidDelay);
 			}
 		}
 	};
+};
+
+Game.prototype.fireBullet = function fireBullet() {
+	if (this.isFiring) {
+		var origin = this.spaceship.currPoints[0];
+		var offSet = this.spaceship.offSet;
+		this.bullets.push(new Bullet(this, origin, offSet));
+	}
 };
 
 // ================= Game related events ================
@@ -183,11 +195,10 @@ Game.prototype.emitEvent = function(event) {
 		this.spaceship.turnLeft = false;
 		break;
 	case 'fire-on':
-		var origin = this.spaceship.currPoints[0];
-		var offSet = this.spaceship.offSet;
-		this.bullets.push(new Bullet(this, origin, offSet));
+		this.isFiring = true;
 		break;
 	case 'fire-off':
+		this.isFiring = false;
 		console.log('stop firing');
 		break;
 	case 'toggle-pause':
