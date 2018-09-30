@@ -63,7 +63,6 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 	const tickLength = this.options.tickLength;
 	const nextTick = lastRender + tickLength;
 	let numTicks;
-	// let timeStamp = timeStamp || this.lastRender; //
 
 	if (timeStamp < nextTick) {
 		// CASE: too early for the next frame, avoid layout thrashing
