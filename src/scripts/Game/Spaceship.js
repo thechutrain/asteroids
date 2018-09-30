@@ -4,7 +4,7 @@ const defaultOpts = {
 	spacer: 0,
 	maxSpeed: 9,
 	minThrust: 3,
-	rotationSpeed: 5,
+	rotationSpeed: 8,
 };
 
 function Spaceship(gameRef, options) {
