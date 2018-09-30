@@ -19,9 +19,7 @@ function Game(opts) {
 	// Dynamic Properties
 	this.bullets = [];
 	this.spaceship;
-	this.asteroids = Array.apply(null, Array(this.options.maxAsteroids)).map(
-		() => null
-	);
+	this.asteroids = [];
 
 	this.isActive = true; // whether the game is active or not
 	this.lastRender = window.performance.now();
@@ -46,7 +44,8 @@ Game.prototype.init = function init() {
 	this.spaceship = new Spaceship(this);
 
 	// Create the asteroids:
-	this.asteroids[0] = new Asteroid(this);
+	// this.asteroids[0] = new Asteroid(this);
+	this.makeAsteroid = this.initMakeAsteroid();
 
 	// Start looping of our game:
 	window.requestAnimationFrame(this.loop.bind(this));
@@ -59,6 +58,7 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 	// RequestAnimationFrame as first line, good practice as per se MDN
 	window.requestAnimationFrame(this.loop.bind(this));
 
+	// Determine numTicks & if enough time has passed to proceed:
 	const lastRender = this.lastRender;
 	const tickLength = this.options.tickLength;
 	const nextTick = lastRender + tickLength;
@@ -74,8 +74,11 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 		this.lastRender = timeStamp;
 	}
 
-	// TEMP: assume a large numTicks means user switched tab && we're pausing state:
+	// note: assume a large numTicks means user switched tab && we're pausing state:
 	if (numTicks > this.options.numTicksBeforePausing) return;
+
+	// Create additional asteroids etc.
+	this.makeAsteroid();
 
 	// GAME LOGIC HERE:
 	// i) calculate points of all objects
@@ -93,9 +96,7 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 	// Calculate new points for all items:
 	this.spaceship.calcPoints(numTicks);
 	this.asteroids.forEach(asteroid => {
-		if (asteroid) {
-			asteroid.calcPoints(numTicks);
-		}
+		asteroid.calcPoints(numTicks);
 	});
 	this.bullets = this.bullets.filter(bullet => {
 		if (!bullet.isActive) {
@@ -109,9 +110,6 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 Game.prototype.processCollisions = function() {
 	let bullets = this.bullets;
 	this.asteroids = this.asteroids.filter(asteroid => {
-		if (asteroid === null) {
-			return true;
-		}
 		// loop through each bullet & check if asteroid contains that bullet
 		for (let i = 0; i < bullets.length; i++) {
 			let bulletPt = bullets[i].origin;
@@ -138,8 +136,29 @@ Game.prototype.paintAllFrames = function paintFrame() {
 		}
 	});
 	this.bullets.forEach(bullet => {
-		bullet.drawPoints();
+		if (bullet.isActive) {
+			bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
+		}
 	});
+};
+
+Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
+	let timerRef = null;
+	let canMakeAsteroid = true;
+	return function makeAsteroid() {
+		if (this.asteroids.length < this.options.maxAsteroids) {
+			if (canMakeAsteroid) {
+				this.asteroids.push(new Asteroid(this));
+				canMakeAsteroid = false;
+			} else if (timerRef === null) {
+				timerRef = setTimeout(function() {
+					console.log('resetting timeout');
+					timerRef = null;
+					canMakeAsteroid = true;
+				}, 3000);
+			}
+		}
+	};
 };
 
 // ================= Game related events ================
