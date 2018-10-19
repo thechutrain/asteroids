@@ -18,7 +18,7 @@ function Asteroid(gameRef, options) {
 	this.canvasElem = gameRef.canvasElem;
 	this.ctx = gameRef.ctx; // reference to the context
 
-	this.origin = { x: 150, y: 130 };
+	this.origin = { x: 150, y: 130 }; // gets overwritten by the init
 	this.r = 45;
 	this.offSet = 0;
 	this.prevPoints = [];
@@ -39,8 +39,35 @@ Asteroid.prototype.init = function() {
 		yLowerSpeedBound,
 	} = classOptions;
 
+	// Determine the random velocity
 	this.options.translateX = getRandomSpeed(xLowerSpeedBound, xUpperSpeedBound);
 	this.options.translateY = getRandomSpeed(yLowerSpeedBound, yUpperSpeedBound);
+
+	// determine the new origin:
+	let quadrant;
+	if (this.options.translateX > 0) {
+		quadrant = this.options.translateY > 0 ? 2 : 3;
+	} else {
+		quadrant = this.options.translateY > 0 ? 1 : 4;
+	}
+
+	let width = this.canvasElem.width;
+	let height = this.canvasElem.height;
+
+	switch (quadrant) {
+	case 1:
+		this.origin = { x: width + 10, y: -10 };
+		break;
+	case 2:
+		this.origin = { x: -10, y: -10 };
+		break;
+	case 3:
+		this.origin = { x: -10, y: height + 10 };
+		break;
+	case 4:
+		this.origin = { x: width + 10, y: height + 10 };
+		break;
+	}
 
 	function getRandomSpeed(min, max, blnDir = true) {
 		let velocity = Math.random() * (max - min) + min;
