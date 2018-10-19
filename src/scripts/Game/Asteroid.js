@@ -1,16 +1,20 @@
 'use strict';
 
-const defaultOpts = {
-	color: 'rgba(48, 128, 232, 0.6)',
-	animate: true,
-	translateX: 3,
-	translateY: 2,
-	spacer: 1, // additional padding space added when calculating off frame reset
+const classOptions = {
+	xUpperSpeedBound: 4,
+	xLowerSpeedBound: 3,
+	yUpperSpeedBound: 3,
+	yLowerSpeedBound: 2,
 };
 
 function Asteroid(gameRef, options) {
 	// TODO: add ability to override deafault options
-	this.options = defaultOpts || {} || options;
+	this.options =
+		{
+			color: 'rgba(48, 128, 232, 0.6)',
+			animate: true,
+			spacer: 1, // additional padding space added when calculating off frame reset
+		} || options;
 	this.canvasElem = gameRef.canvasElem;
 	this.ctx = gameRef.ctx; // reference to the context
 
@@ -28,16 +32,21 @@ function Asteroid(gameRef, options) {
 
 //TODO: create random rotation, x & y axis speed
 Asteroid.prototype.init = function() {
-	// const xUpperSpeedBound = 3;
-	// const xLowerSpeedBound = -1;
-	// this.options.translateX = Math.floor(
-	// 	Math.random() * (xUpperSpeedBound - xLowerSpeedBound) + xLowerSpeedBound
-	// );
-	// const yUpperSpeedBound = 1;
-	// const yLowerSpeedBound = -3;
-	// this.options.translateY = Math.floor(
-	// 	Math.random() * (yUpperSpeedBound - yLowerSpeedBound) + yLowerSpeedBound
-	// );
+	const {
+		xUpperSpeedBound,
+		xLowerSpeedBound,
+		yUpperSpeedBound,
+		yLowerSpeedBound,
+	} = classOptions;
+
+	this.options.translateX = getRandomSpeed(xLowerSpeedBound, xUpperSpeedBound);
+	this.options.translateY = getRandomSpeed(yLowerSpeedBound, yUpperSpeedBound);
+
+	function getRandomSpeed(min, max, blnDir = true) {
+		let velocity = Math.floor(Math.random() * (max - min) + min);
+		let negDirection = blnDir ? Math.random() > 0.5 : false;
+		return negDirection ? velocity * -1 : velocity;
+	}
 };
 
 Asteroid.prototype.calcPoints = function calcPoints(ticks) {
