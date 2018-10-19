@@ -13,7 +13,7 @@ function Spaceship(gameRef, options) {
 	this.options = defaultOpts || {} || options;
 
 	// Position, Orientation, Sizing of Ship:
-	this.origin = { x: 250, y: 200 };
+	this.origin = { x: this.canvasElem.width / 2, y: this.canvasElem.height / 2 };
 	this.offSet = 0; // degrees offset from pointing 12 oclock
 	this.r = 25;
 	this.prevPoints = [];
