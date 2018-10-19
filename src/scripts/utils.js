@@ -42,4 +42,40 @@ function getClosest(elem, selector) {
 	return null;
 }
 
-module.exports = { initThrottler, initDebouncer, getClosest };
+// TODO: need to still test this
+// source: https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object
+function clone(obj) {
+	var copy;
+
+	// check if primitive value, then return (base case of recursive clone)
+	if (typeof obj != 'object' || obj == null) return obj;
+
+	// copying if its a date
+	if (obj instanceof Date) {
+		copy = new Date();
+		copy.setTime(obj.getTime());
+		return copy;
+	}
+
+	// Handle Array
+	if (obj instanceof Array) {
+		copy = [];
+		obj.forEach((elem, index) => {
+			copy[index] = elem;
+		});
+		return copy;
+	}
+
+	// Handle Obj
+	if (obj instanceof Object) {
+		copy = {};
+		for (let attr in obj) {
+			if (obj.hasOwnProperty(attr)) {
+				copy[attr] = clone(copy[attr]);
+			}
+			return copy;
+		}
+	}
+}
+
+module.exports = { initThrottler, initDebouncer, getClosest, clone };
