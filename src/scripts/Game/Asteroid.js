@@ -43,7 +43,8 @@ Asteroid.prototype.init = function() {
 	this.options.translateY = getRandomSpeed(yLowerSpeedBound, yUpperSpeedBound);
 
 	function getRandomSpeed(min, max, blnDir = true) {
-		let velocity = Math.floor(Math.random() * (max - min) + min);
+		let velocity = Math.random() * (max - min) + min;
+		velocity = velocity.toFixed(2);
 		let negDirection = blnDir ? Math.random() > 0.5 : false;
 		return negDirection ? velocity * -1 : velocity;
 	}
