@@ -9,6 +9,7 @@ const defaultGameOpts = {
 	numTicksBeforePausing: 5,
 	maxAsteroids: 5,
 	asteroidDelay: 3 * 1000,
+	firingDelay: 200
 };
 
 function Game(opts) {
@@ -22,6 +23,7 @@ function Game(opts) {
 	this.spaceship;
 	this.asteroids = [];
 	this.isFiring = false;
+	this.canFire = true;
 
 	this.isActive = true; // whether the game is active or not
 	this.lastRender = window.performance.now();
@@ -167,9 +169,15 @@ Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 
 Game.prototype.fireBullet = function fireBullet() {
 	if (this.isFiring) {
-		var origin = this.spaceship.currPoints[0];
-		var offSet = this.spaceship.offSet;
-		this.bullets.push(new Bullet(this, origin, offSet));
+		if (this.canFire) {
+			var origin = this.spaceship.currPoints[0];
+			var offSet = this.spaceship.offSet;
+			this.bullets.push(new Bullet(this, origin, offSet));
+			this.canFire = false;
+			setTimeout(function(){
+				this.canFire = true;
+			}.bind(this), defaultGameOpts.firingDelay);
+		} 
 	}
 };
 
