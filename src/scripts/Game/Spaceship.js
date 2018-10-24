@@ -20,6 +20,7 @@ function Spaceship(gameRef, options) {
 	this.currPoints = [];
 
 	this.onScreen = true; // bln flag to help with reset
+	this.isActive = true;
 
 	// Current movement properties:
 	this.thrusters = false;
@@ -75,6 +76,10 @@ Spaceship.prototype.calcPoints = function() {
 };
 
 Spaceship.prototype.drawPoints = function() {
+	if (!this.isActive) {
+		return;
+	}
+
 	const ctx = this.ctx;
 
 	// Draw the main triangle

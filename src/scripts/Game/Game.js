@@ -115,6 +115,8 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 
 Game.prototype.processCollisions = function() {
 	let bullets = this.bullets;
+	
+	// Check asteroids and bullet collisions
 	this.asteroids = this.asteroids.filter(asteroid => {
 		// loop through each bullet & check if asteroid contains that bullet
 		for (let i = 0; i < bullets.length; i++) {
@@ -125,9 +127,26 @@ Game.prototype.processCollisions = function() {
 				bullets[i].isActive = false;
 			}
 		}
-
+		
 		return asteroid.isActive;
 	});
+
+	// check asteroid & ship collisions
+	for (let i=0; i < this.asteroids.length; i++) {
+		let asteroid = this.asteroids[i];
+
+		for (let j=0; j < this.spaceship.currPoints.length; j++) {
+			let givenPoint = this.spaceship.currPoints[j];
+			if (asteroid.containsPoint(givenPoint)) {
+				console.log('hit');
+				
+				this.spaceship.isActive = false;
+				// TODO: trigger a spaceship event of an explosion
+				return;
+			}
+		}
+	}
+	
 };
 
 Game.prototype.paintAllFrames = function paintFrame() {
