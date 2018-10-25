@@ -34,6 +34,8 @@ function Spaceship(gameRef, options) {
 }
 
 Spaceship.prototype.calcPoints = function() {
+	if (!this.isActive) return;
+
 	this.checkSpeed();
 
 	// Transform origin & angle here:
@@ -149,6 +151,12 @@ Spaceship.prototype.reframe = function() {
 		pt.x = pt.x + adjustXBy;
 		pt.y = pt.y + adjustYBy;
 	});
+};
+
+Spaceship.prototype.onDestroy = function() {
+	console.log('spaceship is no longer active');
+	this.isActive = false;
+	this.currPoints = [];
 };
 /** ======== utility functions ========
  *

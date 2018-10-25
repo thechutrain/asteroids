@@ -25,8 +25,13 @@ function Game(opts) {
 	this.isFiring = false;
 	this.canFire = true;
 
-	this.isActive = true; // whether the game is active or not
 	this.lastRender = window.performance.now();
+
+	// Game Status:
+	this.lives = 3;
+	this.score = 0;
+	this.isActive = true; // whether the game is active or not
+
 
 	this.init();
 }
@@ -44,12 +49,13 @@ Game.prototype.init = function init() {
 	this.canvasElem.height = window.innerHeight;
 	this.ctx = this.canvasElem.getContext('2d');
 
-	// Create spaceship:
-	this.spaceship = new Spaceship(this);
-
-	// Create the asteroids:
-	// this.asteroids[0] = new Asteroid(this);
+	// Initialize factory for making spaceship & asteroid:
+	this.makeSpaceship = this.initMakeSpaceship();
 	this.makeAsteroid = this.initMakeAsteroid();
+	
+	// Create spaceship:
+	this.spaceship = this.makeSpaceship(true);
+
 
 	// Start looping of our game:
 	window.requestAnimationFrame(this.loop.bind(this));
@@ -99,8 +105,11 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 };
 
 Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
+	if (this.spaceship) {
+		this.spaceship.calcPoints(numTicks);
+	}
+	
 	// Calculate new points for all items:
-	this.spaceship.calcPoints(numTicks);
 	this.asteroids.forEach(asteroid => {
 		asteroid.calcPoints(numTicks);
 	});
@@ -132,17 +141,22 @@ Game.prototype.processCollisions = function() {
 	});
 
 	// check asteroid & ship collisions
-	for (let i=0; i < this.asteroids.length; i++) {
-		let asteroid = this.asteroids[i];
-
-		for (let j=0; j < this.spaceship.currPoints.length; j++) {
-			let givenPoint = this.spaceship.currPoints[j];
-			if (asteroid.containsPoint(givenPoint)) {
-				console.log('hit');
-				
-				this.spaceship.isActive = false;
-				// TODO: trigger a spaceship event of an explosion
-				return;
+	if (this.spaceship && this.spaceship.isActive) {
+		for (let i=0; i < this.asteroids.length; i++) {
+			let asteroid = this.asteroids[i];
+	
+			for (let j=0; j < this.spaceship.currPoints.length; j++) {
+				let givenPoint = this.spaceship.currPoints[j];
+				if (asteroid.containsPoint(givenPoint)) {
+					console.log('hit');	
+					this.spaceship.onDestroy();
+					this.spaceship = null;
+	
+					this.makeSpaceship();
+					
+					// TODO: trigger a spaceship event of an explosion
+					return;
+				}
 			}
 		}
 	}
@@ -154,7 +168,9 @@ Game.prototype.paintAllFrames = function paintFrame() {
 	this.ctx.clearRect(0, 0, this.canvasElem.width, this.canvasElem.height);
 
 	// Draw new points for all items:
-	this.spaceship.drawPoints();
+	if (this.spaceship) {
+		this.spaceship.drawPoints();
+	}
 	this.asteroids.forEach(asteroid => {
 		if (asteroid) {
 			asteroid.drawPoints();
@@ -165,6 +181,31 @@ Game.prototype.paintAllFrames = function paintFrame() {
 			bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
 		}
 	});
+};
+
+Game.prototype.initMakeSpaceship = function initMakeSpaceship(){
+	let timeout;
+
+	return function makeSpaceship(blnMakeNow = false){
+		// check if there are enough lives:
+		if (this.lives === 0) {
+			this.isActive = false;
+			console.log('GAME OVER!!!!');
+		} else {
+			// Can make spaceship
+			if (!timeout && !blnMakeNow) {
+				this.lives -=1;
+				console.log('lost a life');
+				setTimeout(function(){
+					timeout = null;
+					this.spaceship = new Spaceship(this);
+				}.bind(this), 2000);
+				return null;
+			} else {
+				return new Spaceship(this);
+			}
+		}
+	};
 };
 
 Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
