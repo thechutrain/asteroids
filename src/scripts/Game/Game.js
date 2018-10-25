@@ -134,6 +134,8 @@ Game.prototype.processCollisions = function() {
 			let bulletPt = bullets[i].origin;
 			if (asteroid.containsPoint(bulletPt)) {
 				console.log('Hit the asteroid!!!');
+				this.scoreboard.addScore(asteroid.scoreValue || 1);
+
 				asteroid.isActive = false;
 				bullets[i].isActive = false;
 			}

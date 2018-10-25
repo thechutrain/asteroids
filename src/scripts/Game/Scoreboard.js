@@ -41,4 +41,9 @@ Scoreboard.prototype.setLife = function setLife(number){
 	this.livesDOM.innerHTML = this.lives;
 };
 
+Scoreboard.prototype.addScore = function addScore(number) {
+	this.score += number;
+	this.scoreDOM.innerHTML = this.score;
+};
+
 module.exports = Scoreboard;

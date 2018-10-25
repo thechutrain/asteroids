@@ -24,6 +24,8 @@ function Asteroid(gameRef, options) {
 	this.prevPoints = [];
 	this.currPoints = [];
 
+	this.scoreValue = 15;
+
 	this.onScreen = true; // when true, means at least one point is on the canvas
 	this.isActive = true; // determines if its been hit or not
 
