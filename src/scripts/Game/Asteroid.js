@@ -108,8 +108,6 @@ Asteroid.prototype.calcPoints = function calcPoints(ticks) {
 	}
 };
 
-Asteroid.prototype.hasCollided = function hasCollided(x, y) {};
-
 Asteroid.prototype.drawPoints = function drawPoints() {
 	const ctx = this.ctx;
 	const { color } = this.options;
@@ -314,67 +312,5 @@ Asteroid.prototype.containsPoint = function containsPoint(ptCoord) {
 	}
 };
 
-function triangleContains(triCoord, ptCoord) {
-	// const { leftBound, rightBound, upperBound, lowerBound } = getBounds(triCoord);
-
-	// if (ptCoord.x < leftBound || ptCoord.x > rightBound) {
-	// 	return false;
-	// } else if (ptCoord.y < upperBound || ptCoord.y > lowerBound) {
-	// 	return false;
-	// }
-
-	// Returns an array of bln values of whether the pt is below a generated line or not
-	const lineResults = triCoord.map((pt1, index, coordArr) => {
-		const x1 = pt1.x;
-		const y1 = pt1.y;
-		const x2 =
-			index + 1 < coordArr.length ? coordArr[index + 1].x : coordArr[0].x;
-		const y2 =
-			index + 1 < coordArr.length ? coordArr[index + 1].y : coordArr[0].y;
-		const m = (y1 - y2) / (x1 - x2);
-		const b = y1 - m * x1;
-
-		// Edge Case: slope is a vertical line
-		if (m === Infinity) {
-			return ptCoord.x < x1;
-		} else {
-			return ptCoord.y < m * ptCoord.x + b;
-		}
-	});
-
-	// Assume this is for a triangle: should be two true & one false
-	let numLinesBelow = 0;
-	lineResults.forEach(res => {
-		if (res) {
-			numLinesBelow++;
-		}
-	});
-
-	return numLinesBelow === 2;
-
-	// Refactor so its more general?
-	function getBounds(coordArr) {
-		let leftBound, rightBound, upperBound, lowerBound;
-		coordArr.forEach((pt, i) => {
-			let { x, y } = pt;
-			if (i === 0) {
-				//Sets default values
-				leftBound = rightBound = x;
-				upperBound = lowerBound = y;
-			} else {
-				leftBound = Math.min(leftBound, x);
-				rightBound = Math.max(rightBound, x);
-				upperBound = Math.min(upperBound, y);
-				lowerBound = Math.max(lowerBound, y);
-			}
-		});
-		return { leftBound, rightBound, upperBound, lowerBound };
-	}
-}
-
-// let tri = [{ x: 5, y: 5 }, { x: 5, y: 0 }, { x: 2, y: 3 }];
-
-// let isContained = triangleContains(tri, { x: 3, y: 8 });
-// console.log(isContained);
 
 module.exports = exports = Asteroid;
