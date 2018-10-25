@@ -3,6 +3,7 @@
 const Asteroid = require('./Asteroid');
 const Spaceship = require('./Spaceship');
 const Bullet = require('./Bullet');
+const Scoreboard = require('./Scoreboard');
 
 const defaultGameOpts = {
 	tickLength: 50, // ms time in between frames
@@ -28,10 +29,8 @@ function Game(opts) {
 	this.lastRender = window.performance.now();
 
 	// Game Status:
-	this.lives = 3;
-	this.score = 0;
 	this.isActive = true; // whether the game is active or not
-
+	this.scoreboard;
 
 	this.init();
 }
@@ -49,13 +48,16 @@ Game.prototype.init = function init() {
 	this.canvasElem.height = window.innerHeight;
 	this.ctx = this.canvasElem.getContext('2d');
 
+	// initialize the scoreboard object
+	this.scoreboard = new Scoreboard();
+	this.scoreboard.init();
+
 	// Initialize factory for making spaceship & asteroid:
 	this.makeSpaceship = this.initMakeSpaceship();
 	this.makeAsteroid = this.initMakeAsteroid();
 	
 	// Create spaceship:
 	this.spaceship = this.makeSpaceship(true);
-
 
 	// Start looping of our game:
 	window.requestAnimationFrame(this.loop.bind(this));
@@ -188,20 +190,20 @@ Game.prototype.initMakeSpaceship = function initMakeSpaceship(){
 
 	return function makeSpaceship(blnMakeNow = false){
 		// check if there are enough lives:
-		if (this.lives === 0) {
+		if (this.scoreboard.lives === 0) {
 			this.isActive = false;
 			console.log('GAME OVER!!!!');
 		} else {
 			// Can make spaceship
 			if (!timeout && !blnMakeNow) {
-				this.lives -=1;
-				console.log('lost a life');
+				this.scoreboard.setLife('-1');
 				setTimeout(function(){
 					timeout = null;
 					this.spaceship = new Spaceship(this);
-				}.bind(this), 2000);
+				}.bind(this), 1000);
 				return null;
 			} else {
+				this.scoreboard.setLife('-1');
 				return new Spaceship(this);
 			}
 		}
