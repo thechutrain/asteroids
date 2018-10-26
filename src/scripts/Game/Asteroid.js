@@ -1,3 +1,6 @@
+/**
+ * NOTE: Asteroid class requires a gameRef (canvasElem & ctx) in order to render correctly
+ */
 'use strict';
 
 const Utils = require('../utils');
