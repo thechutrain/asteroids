@@ -235,6 +235,8 @@ Asteroid.prototype.getBounds = function() {
 };
 
 Asteroid.prototype.containsPoint = function containsPoint(ptCoord) {
+	if (!this.currPoints.length) return false;
+	
 	const { leftBound, rightBound, upperBound, lowerBound } = getBounds(
 		this.currPoints
 	);
