@@ -227,6 +227,10 @@ Game.prototype.initMakeSpaceship = function initMakeSpaceship(){
 Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 	let timerRef = null;
 	let canMakeAsteroid = true;
+	
+	// Save the Game Obj as a static property on the Asteroid class
+	Asteroid.gameRef = this;
+
 	return function makeAsteroid(blnForce = false, options = {}) {
 		if (blnForce) {
 			this.asteroids.push(new Asteroid(this, options));
