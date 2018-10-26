@@ -5,13 +5,6 @@
 
 const Utils = require('../utils');
 
-const classOptions = {
-	xUpperSpeedBound: 4,
-	xLowerSpeedBound: 3,
-	yUpperSpeedBound: 3,
-	yLowerSpeedBound: 2,
-};
-
 const defaultOpts = {
 	color: 'rgba(48, 128, 232, 0.6)',
 	animate: true,
@@ -20,40 +13,63 @@ const defaultOpts = {
 	scoreValue: 5
 };
 
+function getRandomSpeed(axis = 'x', blnDir = true){
+	const speedOptions = {
+		xUpperSpeedBound: 4,
+		xLowerSpeedBound: 3,
+		yUpperSpeedBound: 3,
+		yLowerSpeedBound: 2,
+	};
+	let min, max;
+	if (axis === 'x') {
+		min = speedOptions.xLowerSpeedBound;
+		max = speedOptions.xUpperSpeedBound;	
+	} else {
+		min = speedOptions.yLowerSpeedBound;
+		max = speedOptions.yUpperSpeedBound;	
+	}
+
+	let velocity = Math.random() * (max - min) + min;
+	velocity = velocity.toFixed(2);
+	let negDirection = blnDir ? Math.random() > 0.5 : false;
+	return negDirection ? velocity * -1 : velocity;
+}
+
 class Asteroid {
 	constructor(options={}) {
+		console.log('created asteroid');
 		this.options = Utils.extend(defaultOpts, options);
 		
-		this.origin = { x: 150, y: 130 }; // gets overwritten by the init
-		this.r = 45;
-		this.offSet = 0;
+		this.origin = options.origin ? options.origin : {};
+		this.r = options.r || 45;
+		this.offSet = options.offSet || 0;
+		this.translateX = options.translateX || getRandomSpeed('x');
+		this.translateY = options.translateY || getRandomSpeed('y');
+		
+		// Derived Properties:
 		this.prevPoints = [];
 		this.currPoints = [];
-		
 		this.onScreen = true; // when true, means at least one point is on the canvas
 		this.isActive = true; // determines if its been hit or not
 
 		this.init();
 	}
 
+	/**
+	 * initializer function
+	 */
 	init() {
-		const {
-			xUpperSpeedBound,
-			xLowerSpeedBound,
-			yUpperSpeedBound,
-			yLowerSpeedBound,
-		} = classOptions;
-	
-		// Determine the random velocity
-		this.options.translateX = getRandomSpeed(xLowerSpeedBound, xUpperSpeedBound);
-		this.options.translateY = getRandomSpeed(yLowerSpeedBound, yUpperSpeedBound);
-	
+		// Check if there's an intial origin
+		if (this.origin.hasOwnProperty('x') && this.origin.hasOwnProperty('y')) {
+			return;
+		}
+
 		// determine the new origin:
 		let quadrant;
-		if (this.options.translateX > 0) {
-			quadrant = this.options.translateY > 0 ? 2 : 3;
+		if (this.translateX > 0) {
+			quadrant = this.translateY > 0 ? 2 : 3;
 		} else {
-			quadrant = this.options.translateY > 0 ? 1 : 4;
+			quadrant = this.translateY > 0 ? 1 : 4;
 		}
 	
 		let width = Asteroid.gameRef.canvasElem.width;
@@ -74,16 +90,16 @@ class Asteroid {
 			break;
 		}
 	
-		function getRandomSpeed(min, max, blnDir = true) {
-			let velocity = Math.random() * (max - min) + min;
-			velocity = velocity.toFixed(2);
-			let negDirection = blnDir ? Math.random() > 0.5 : false;
-			return negDirection ? velocity * -1 : velocity;
-		}
+
 	}
 
+	/** Main Functions:
+	 * calcPoints()
+	 * drawPoints()
+	 * reframe()
+	 */
 	calcPoints(ticks) {
-		const { translateX, translateY } = this.options;
+		const { translateX, translateY } = this;
 		const moveXBy = ticks * translateX;
 		const moveYBy = ticks * translateY;
 	
@@ -143,7 +159,7 @@ class Asteroid {
 
 		// ===== ADJUST X-coordinates =====
 		// CASE: moving right
-		if (this.options.translateX > 0) {
+		if (this.translateX > 0) {
 		// Check to see if the trailing edge (far left x-coord on shape) is off screen
 			if (leftBound > xLimit) {
 			// then adjust all the x-coordinates
@@ -160,7 +176,7 @@ class Asteroid {
 
 		// ===== ADJUST Y-coordinates =====
 		// CASE: moving down
-		if (this.options.translateY > 0) {
+		if (this.translateY > 0) {
 		// Case: moving down, could potentially be below canvas
 			if (upperBound > yLimit) {
 				adjustYBy = -1 * (lowerBound + this.options.spacer);
@@ -188,8 +204,19 @@ class Asteroid {
 		this.isActive = false;
 
 		if (this.options.level < Asteroid.gameRef.options.maxChildAsteroids) {
-			let nextLevel = this.options.level + 1;
-			childAsteroids.push(new Asteroid(this, { level: nextLevel}));
+			const x = this.origin.x;
+			const y = this.origin.y;
+
+			let options = {
+				level: this.options.level + 1,
+				origin: {
+					x,
+					y
+				}
+				// origin: Utils.clone(this.origin)
+			};
+			childAsteroids.push(new Asteroid(options));
+			childAsteroids.push(new Asteroid(options));
 		}
 		
 
