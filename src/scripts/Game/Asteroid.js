@@ -1,5 +1,7 @@
 'use strict';
 
+const Utils = require('../utils');
+
 const classOptions = {
 	xUpperSpeedBound: 4,
 	xLowerSpeedBound: 3,
@@ -7,14 +9,19 @@ const classOptions = {
 	yLowerSpeedBound: 2,
 };
 
-function Asteroid(gameRef, options) {
+const defaultOpts = {
+	color: 'rgba(48, 128, 232, 0.6)',
+	animate: true,
+	spacer: 1, // additional padding space added when calculating off frame reset
+	level: 1,
+	scoreValue: 5
+};
+
+function Asteroid(gameRef, options = {}) {
 	// TODO: add ability to override deafault options
-	this.options =
-		{
-			color: 'rgba(48, 128, 232, 0.6)',
-			animate: true,
-			spacer: 1, // additional padding space added when calculating off frame reset
-		} || options;
+	this.gameRef = gameRef;
+	this.options = Utils.extend(defaultOpts, options);
+		
 	this.canvasElem = gameRef.canvasElem;
 	this.ctx = gameRef.ctx; // reference to the context
 
@@ -24,15 +31,17 @@ function Asteroid(gameRef, options) {
 	this.prevPoints = [];
 	this.currPoints = [];
 
-	this.scoreValue = 15;
+	// this.scoreValue = 15;
 
 	this.onScreen = true; // when true, means at least one point is on the canvas
 	this.isActive = true; // determines if its been hit or not
 
+	// this.level = 1;
+
 	this.init();
 }
 
-//TODO: create random rotation, x & y axis speed
+//TODO: add ability to provide an origin to use for creating new asteroids
 Asteroid.prototype.init = function() {
 	const {
 		xUpperSpeedBound,
@@ -178,9 +187,29 @@ Asteroid.prototype.reframe = function reframe() {
 	});
 };
 
+/** Destroys current asteroid and returns smaller asteroids if possible */
+Asteroid.prototype.destroy = function destroy() {
+	let childAsteroids = [];
+	this.isActive = false;
+
+	if (this.options.level < this.gameRef.options.maxChildAsteroids) {
+		let nextLevel = this.options.level + 1;
+		childAsteroids.push(new Asteroid(this, { level: nextLevel}));
+		// this.gameRef.makeAsteroid(true, {level: nextLevel});
+		// this.gameRef.makeAsteroid(true, {level: nextLevel});
+		// 	const ast1 =  new Asteroid(this.gameRef);
+		// 	const ast2 =  new Asteroid(this.gameRef);
+		// 	ast1.level += 1;
+		// 	ast2.level += 1  ;
+	}
+	// Check asteroid level
+
+	return childAsteroids;
+};
+
 // ========= Visibility utility functions ==========
 //#region visibility utility functions
-/** isPartiallayVisible)_
+/** isPartiallayVisible()
  * @returns {boolean} - true --> indicates that the shape is partially hidden & partially visible.
  */
 Asteroid.prototype.isPartiallyVisible = function() {

@@ -8,7 +8,8 @@ const Scoreboard = require('./Scoreboard');
 const defaultGameOpts = {
 	tickLength: 50, // ms time in between frames
 	numTicksBeforePausing: 5,
-	maxAsteroids: 5,
+	maxAsteroids: 1,
+	maxChildAsteroids: 2,
 	asteroidDelay: 3 * 1000,
 	firingDelay: 200
 };
@@ -107,14 +108,18 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 };
 
 Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
+	// TODO: after I used typescript & abstract out function constructors, make this more general?
 	if (this.spaceship) {
 		this.spaceship.calcPoints(numTicks);
 	}
 	
 	// Calculate new points for all items:
-	this.asteroids.forEach(asteroid => {
-		asteroid.calcPoints(numTicks);
+	this.asteroids.forEach((asteroid) => {
+		if (asteroid.isActive) {
+			asteroid.calcPoints(numTicks);
+		}
 	});
+
 	this.bullets = this.bullets.filter(bullet => {
 		if (!bullet.isActive) {
 			return false;
@@ -128,21 +133,25 @@ Game.prototype.processCollisions = function() {
 	let bullets = this.bullets;
 	
 	// Check asteroids and bullet collisions
+	let newAsteroids = [];
 	this.asteroids = this.asteroids.filter(asteroid => {
 		// loop through each bullet & check if asteroid contains that bullet
 		for (let i = 0; i < bullets.length; i++) {
 			let bulletPt = bullets[i].origin;
-			if (asteroid.containsPoint(bulletPt)) {
-				console.log('Hit the asteroid!!!');
-				this.scoreboard.addScore(asteroid.scoreValue || 1);
 
-				asteroid.isActive = false;
+			if (asteroid.containsPoint(bulletPt)) {
+				this.scoreboard.addScore(asteroid.options.scoreValue || 1);
+				let childAsteroids = asteroid.destroy();
+				if (childAsteroids.length !== 0) {
+					newAsteroids = newAsteroids.concat(childAsteroids);
+				}
 				bullets[i].isActive = false;
 			}
 		}
-		
+
 		return asteroid.isActive;
 	});
+	this.asteroids = this.asteroids.concat(newAsteroids);
 
 	// check asteroid & ship collisions
 	if (this.spaceship && this.spaceship.isActive) {
@@ -175,11 +184,13 @@ Game.prototype.paintAllFrames = function paintFrame() {
 	if (this.spaceship) {
 		this.spaceship.drawPoints();
 	}
+
 	this.asteroids.forEach(asteroid => {
-		if (asteroid) {
+		if (asteroid.isActive) {
 			asteroid.drawPoints();
 		}
 	});
+
 	this.bullets.forEach(bullet => {
 		if (bullet.isActive) {
 			bullet.drawPoints(); // drawPoints also checks if its Active, dont know where it would be better
@@ -212,11 +223,14 @@ Game.prototype.initMakeSpaceship = function initMakeSpaceship(){
 	};
 };
 
+// TODO: refactor, make asteroids & do it in waves?
 Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 	let timerRef = null;
 	let canMakeAsteroid = true;
-	return function makeAsteroid() {
-		if (this.asteroids.length < this.options.maxAsteroids) {
+	return function makeAsteroid(blnForce = false, options = {}) {
+		if (blnForce) {
+			this.asteroids.push(new Asteroid(this, options));
+		} else if (this.asteroids.length < this.options.maxAsteroids) {
 			if (canMakeAsteroid) {
 				this.asteroids.push(new Asteroid(this));
 				canMakeAsteroid = false;
