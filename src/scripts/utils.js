@@ -71,11 +71,38 @@ function clone(obj) {
 		copy = {};
 		for (let attr in obj) {
 			if (obj.hasOwnProperty(attr)) {
-				copy[attr] = clone(copy[attr]);
+				copy[attr] = clone(obj[attr]);
 			}
 			return copy;
 		}
 	}
 }
 
-module.exports = { initThrottler, initDebouncer, getClosest, clone };
+function extend (){
+	let extendedObj = {};
+
+	for (let i=0; i < arguments.length; i++) {
+		let obj = arguments[i];
+		if (!(obj instanceof Object)) break;
+		for (let key in obj) {
+			if (obj.hasOwnProperty(key)){
+				extendedObj[key] = clone(obj[key]);
+			}
+		}
+	}
+
+	return extendedObj;
+}
+
+// var obj1 = { a: 'apple', s: { 's': 'special'}};
+// var obj2 = { b: 'banana'};
+// var obj3 = {a: 'almonds'};
+
+// var test = extend (obj1, obj2, obj3);
+
+// obj1.s = 'changed ....';
+
+// console.log(test);
+// console.log(obj1);
+
+module.exports = { initThrottler, initDebouncer, getClosest, clone, extend };
