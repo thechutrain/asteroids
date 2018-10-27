@@ -12,29 +12,7 @@ const defaultOpts = {
 	level: 1,
 	scoreValue: 5
 };
-
-function getRandomSpeed(axis = 'x', blnDir = true){
-	const speedOptions = {
-		xUpperSpeedBound: 4,
-		xLowerSpeedBound: 3,
-		yUpperSpeedBound: 3,
-		yLowerSpeedBound: 2,
-	};
-	let min, max;
-	if (axis === 'x') {
-		min = speedOptions.xLowerSpeedBound;
-		max = speedOptions.xUpperSpeedBound;	
-	} else {
-		min = speedOptions.yLowerSpeedBound;
-		max = speedOptions.yUpperSpeedBound;	
-	}
-
-	let velocity = Math.random() * (max - min) + min;
-	velocity = velocity.toFixed(2);
-	let negDirection = blnDir ? Math.random() > 0.5 : false;
-	return negDirection ? velocity * -1 : velocity;
-}
-
+	
 class Asteroid {
 	constructor(options={}) {
 		console.log('created asteroid');
@@ -59,12 +37,12 @@ class Asteroid {
 	 * initializer function
 	 */
 	init() {
-		// Check if there's an intial origin
+		// If provided with an origin, don't randomly create another one
 		if (this.origin.hasOwnProperty('x') && this.origin.hasOwnProperty('y')) {
 			return;
 		}
 
-		// determine the new origin:
+		// Default: no origin, determin which quadrant offscreen to originate from:
 		let quadrant;
 		if (this.translateX > 0) {
 			quadrant = this.translateY > 0 ? 2 : 3;
@@ -89,8 +67,6 @@ class Asteroid {
 			this.origin = { x: width + 10, y: height + 10 };
 			break;
 		}
-	
-
 	}
 
 	/** Main Functions:
@@ -349,7 +325,36 @@ class Asteroid {
 	}
 }
 
+/**
+ * helper function to get random speed
+ * 
+ * @param {string} axis 
+ * @param {*} blnDir 
+ */
+function getRandomSpeed(axis = 'x', blnDir = true){
+	const speedOptions = {
+		xUpperSpeedBound: 4,
+		xLowerSpeedBound: 3,
+		yUpperSpeedBound: 3,
+		yLowerSpeedBound: 2,
+	};
+	let min, max;
+	if (axis === 'x') {
+		min = speedOptions.xLowerSpeedBound;
+		max = speedOptions.xUpperSpeedBound;	
+	} else {
+		min = speedOptions.yLowerSpeedBound;
+		max = speedOptions.yUpperSpeedBound;	
+	}
+
+	let velocity = Math.random() * (max - min) + min;
+	velocity = velocity.toFixed(2);
+	let negDirection = blnDir ? Math.random() > 0.5 : false;
+	return negDirection ? velocity * -1 : velocity;
+}
 
 
-
-module.exports = exports = Asteroid;
+module.exports = exports = {
+	Asteroid,
+	getRandomSpeed
+};
