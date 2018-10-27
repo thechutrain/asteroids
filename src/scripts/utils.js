@@ -73,8 +73,8 @@ function clone(obj) {
 			if (obj.hasOwnProperty(attr)) {
 				copy[attr] = clone(obj[attr]);
 			}
-			return copy;
 		}
+		return copy;
 	}
 }
 
