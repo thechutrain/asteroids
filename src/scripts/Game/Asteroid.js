@@ -176,27 +176,7 @@ class Asteroid {
 
 	/** Destroys current asteroid and returns smaller asteroids if possible */
 	destroy(){
-		let childAsteroids = [];
 		this.isActive = false;
-
-		if (this.options.level < Asteroid.gameRef.options.maxChildAsteroids) {
-			const x = this.origin.x;
-			const y = this.origin.y;
-
-			let options = {
-				level: this.options.level + 1,
-				origin: {
-					x,
-					y
-				}
-				// origin: Utils.clone(this.origin)
-			};
-			childAsteroids.push(new Asteroid(options));
-			childAsteroids.push(new Asteroid(options));
-		}
-		
-
-		return childAsteroids;
 	}
 
 	// ========= Visibility utility functions ==========
@@ -325,12 +305,43 @@ class Asteroid {
 	}
 }
 
-/**
- * helper function to get random speed
- * 
- * @param {string} axis 
- * @param {*} blnDir 
- */
+Asteroid.createFromParent = function(parentAsteroid){
+	const childAsteroids = [];
+	const level = parentAsteroid.options.level + 1;
+	const MAX_LEVEL = Asteroid.gameRef.options.maxChildAsteroids;
+
+	if (level > MAX_LEVEL) return [];
+
+	const speedX = getRandomSpeed('x');
+	const speedY = getRandomSpeed('y');
+	const r = Math.floor(parentAsteroid.r / 2);
+	const scoreValue = parentAsteroid.options.scoreValue * 2;
+
+
+
+	childAsteroids.push(new Asteroid({
+		translateX: speedX,
+		translateY: speedY,
+		origin: Utils.clone(parentAsteroid.origin),
+		level,
+		r,
+		scoreValue
+	}));
+
+	childAsteroids.push(new Asteroid({
+		translateX: -1 * speedX,
+		translateY: -1* speedY,
+		origin: Utils.clone(parentAsteroid.origin),
+		level,
+		r,
+		scoreValue
+	}));
+
+	return childAsteroids;
+};
+
+
+// ================ HELPER FUNCTION ============
 function getRandomSpeed(axis = 'x', blnDir = true){
 	const speedOptions = {
 		xUpperSpeedBound: 4,
@@ -354,7 +365,4 @@ function getRandomSpeed(axis = 'x', blnDir = true){
 }
 
 
-module.exports = exports = {
-	Asteroid,
-	getRandomSpeed
-};
+module.exports = exports = Asteroid; 

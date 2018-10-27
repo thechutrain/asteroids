@@ -1,6 +1,6 @@
 'use strict';
 
-const Asteroid = require('./Asteroid');
+const Asteroid  = require('./Asteroid');
 const Spaceship = require('./Spaceship');
 const Bullet = require('./Bullet');
 const Scoreboard = require('./Scoreboard');
@@ -139,9 +139,15 @@ Game.prototype.processCollisions = function() {
 		for (let i = 0; i < bullets.length; i++) {
 			let bulletPt = bullets[i].origin;
 
+			// Case: bullet --> asteroid (hit)
 			if (asteroid.containsPoint(bulletPt)) {
 				this.scoreboard.addScore(asteroid.options.scoreValue || 1);
-				let childAsteroids = asteroid.destroy();
+				
+				asteroid.destroy();
+
+				let childAsteroids = Asteroid.createFromParent(asteroid);
+
+
 				if (childAsteroids.length !== 0) {
 					newAsteroids = newAsteroids.concat(childAsteroids);
 				}
@@ -161,7 +167,7 @@ Game.prototype.processCollisions = function() {
 			for (let j=0; j < this.spaceship.currPoints.length; j++) {
 				let givenPoint = this.spaceship.currPoints[j];
 				if (asteroid.containsPoint(givenPoint)) {
-					console.log('hit');	
+				
 					this.spaceship.onDestroy();
 					this.spaceship = null;
 	
@@ -233,10 +239,10 @@ Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 
 	return function makeAsteroid(blnForce = false, options = {}) {
 		if (blnForce) {
-			this.asteroids.push(new Asteroid(this, options));
+			this.asteroids.push(new Asteroid(options));
 		} else if (this.asteroids.length < this.options.maxAsteroids) {
 			if (canMakeAsteroid) {
-				this.asteroids.push(new Asteroid(this));
+				this.asteroids.push(new Asteroid());
 				canMakeAsteroid = false;
 			} else if (timerRef === null) {
 				timerRef = setTimeout(function() {
