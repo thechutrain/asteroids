@@ -1,31 +1,31 @@
 {
-	"name": "asteroids",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"test": "jest",
-		"dev": "gulp dev",
-		"build": "parcel build src/**.html",
-		"publish": "npm run build && surge ./dist asteroid-ship.surge.sh",
-		"start": "parcel src/index.html"
-	},
-	"keywords": [
-		"asteroids",
-		"canvas",
-		"javascript"
-	],
-	"author": "Alan Chu",
-	"license": "ISC",
-	"dependencies": {},
-	"devDependencies": {
-		"eslint": "^5.8.0",
-		"eslint-config-airbnb": "^17.1.0",
-		"eslint-plugin-import": "^2.14.0",
-		"eslint-plugin-jsx-a11y": "^6.1.2",
-		"eslint-plugin-react": "^7.11.1",
-		"jest": "^23.6.0",
-		"parcel-bundler": "^1.10.3",
-		"prettier": "^1.14.3"
-	}
+  "name": "asteroids",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "gulp dev",
+    "build": "parcel build src/**.html",
+    "publish": "npm run build && surge ./dist asteroid-ship.surge.sh",
+    "start": "parcel src/index.html"
+  },
+  "keywords": [
+    "asteroids",
+    "canvas",
+    "javascript"
+  ],
+  "author": "Alan Chu",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^5.8.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1",
+    "jest": "^23.6.0",
+    "parcel-bundler": "^1.10.3",
+    "prettier": "^1.14.3"
+  }
 }
