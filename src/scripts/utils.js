@@ -1,9 +1,8 @@
 /** utility functions here
  *
  */
-'use strict';
 
-//#region debouncing & throttling
+// #region debouncing & throttling
 // source: https://css-tricks.com/debouncing-throttling-explained-examples/
 function initThrottler(fn, timeout) {
 	let canRun = true;
@@ -12,7 +11,7 @@ function initThrottler(fn, timeout) {
 		if (canRun) {
 			canRun = false;
 			fn.apply(this, arguments);
-			setTimeout(function() {
+			setTimeout(() => {
 				canRun = true;
 			}, timeout);
 		}
@@ -32,7 +31,7 @@ function initDebouncer(fn, timout) {
 		}, timout);
 	};
 }
-//#endregion
+// #endregion
 
 // source: https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
 function getClosest(elem, selector) {
@@ -45,10 +44,10 @@ function getClosest(elem, selector) {
 // TODO: need to still test this
 // source: https://stackoverflow.com/questions/728360/how-do-i-correctly-clone-a-javascript-object
 function clone(obj) {
-	var copy;
+	let copy;
 
 	// check if primitive value, then return (base case of recursive clone)
-	if (typeof obj != 'object' || obj == null) return obj;
+	if (typeof obj !== 'object' || obj == null) return obj;
 
 	// copying if its a date
 	if (obj instanceof Date) {
@@ -69,7 +68,7 @@ function clone(obj) {
 	// Handle Obj
 	if (obj instanceof Object) {
 		copy = {};
-		for (let attr in obj) {
+		for (const attr in obj) {
 			if (obj.hasOwnProperty(attr)) {
 				copy[attr] = clone(obj[attr]);
 			}
@@ -78,14 +77,14 @@ function clone(obj) {
 	}
 }
 
-function extend (){
-	let extendedObj = {};
+function extend() {
+	const extendedObj = {};
 
-	for (let i=0; i < arguments.length; i++) {
-		let obj = arguments[i];
+	for (let i = 0; i < arguments.length; i++) {
+		const obj = arguments[i];
 		if (!(obj instanceof Object)) break;
-		for (let key in obj) {
-			if (obj.hasOwnProperty(key)){
+		for (const key in obj) {
+			if (obj.hasOwnProperty(key)) {
 				extendedObj[key] = clone(obj[key]);
 			}
 		}
@@ -105,4 +104,10 @@ function extend (){
 // console.log(test);
 // console.log(obj1);
 
-module.exports = { initThrottler, initDebouncer, getClosest, clone, extend };
+module.exports = {
+	initThrottler,
+	initDebouncer,
+	getClosest,
+	clone,
+	extend
+};

@@ -1,6 +1,4 @@
-'use strict';
-
-const Asteroid  = require('./Asteroid');
+const Asteroid = require('./Asteroid');
 const Spaceship = require('./Spaceship');
 const Bullet = require('./Bullet');
 const Scoreboard = require('./Scoreboard');
@@ -56,7 +54,7 @@ Game.prototype.init = function init() {
 	// Initialize factory for making spaceship & asteroid:
 	this.makeSpaceship = this.initMakeSpaceship();
 	this.makeAsteroid = this.initMakeAsteroid();
-	
+
 	// Create spaceship:
 	this.spaceship = this.makeSpaceship(true);
 
@@ -80,12 +78,11 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 	if (timeStamp < nextTick) {
 		// CASE: too early for the next frame, avoid layout thrashing
 		return false;
-	} else {
-		// CASE: enough time has passed since last render & time to update by ticks
-		let timeSinceTick = timeStamp - lastRender;
-		numTicks = Math.floor(timeSinceTick / tickLength);
-		this.lastRender = timeStamp;
 	}
+	// CASE: enough time has passed since last render & time to update by ticks
+	const timeSinceTick = timeStamp - lastRender;
+	numTicks = Math.floor(timeSinceTick / tickLength);
+	this.lastRender = timeStamp;
 
 	// note: assume a large numTicks means user switched tab && we're pausing state:
 	if (numTicks > this.options.numTicksBeforePausing) return;
@@ -99,7 +96,7 @@ Game.prototype.loop = function loop(timeStamp = this.lastRender) {
 	// i) calculate points of all objects
 	this.calcAllPoints(numTicks);
 
-	//TODO:
+	// TODO:
 	// ii) look for collisions asteroids w./ spaceship && asteroid w./ bullets
 	this.processCollisions();
 
@@ -112,9 +109,9 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 	if (this.spaceship) {
 		this.spaceship.calcPoints(numTicks);
 	}
-	
+
 	// Calculate new points for all items:
-	this.asteroids.forEach((asteroid) => {
+	this.asteroids.forEach(asteroid => {
 		if (asteroid.isActive) {
 			asteroid.calcPoints(numTicks);
 		}
@@ -123,30 +120,28 @@ Game.prototype.calcAllPoints = function calcAllPoints(numTicks) {
 	this.bullets = this.bullets.filter(bullet => {
 		if (!bullet.isActive) {
 			return false;
-		} else {
-			return bullet.calcPoints();
 		}
+		return bullet.calcPoints();
 	});
 };
 
 Game.prototype.processCollisions = function() {
-	let bullets = this.bullets;
-	
+	const bullets = this.bullets;
+
 	// Check asteroids and bullet collisions
 	let newAsteroids = [];
 	this.asteroids = this.asteroids.filter(asteroid => {
 		// loop through each bullet & check if asteroid contains that bullet
 		for (let i = 0; i < bullets.length; i++) {
-			let bulletPt = bullets[i].origin;
+			const bulletPt = bullets[i].origin;
 
 			// Case: bullet --> asteroid (hit)
 			if (asteroid.containsPoint(bulletPt)) {
 				this.scoreboard.addScore(asteroid.options.scoreValue || 1);
-				
+
 				asteroid.destroy();
 
-				let childAsteroids = Asteroid.createFromParent(asteroid);
-
+				const childAsteroids = Asteroid.createFromParent(asteroid);
 
 				if (childAsteroids.length !== 0) {
 					newAsteroids = newAsteroids.concat(childAsteroids);
@@ -161,25 +156,23 @@ Game.prototype.processCollisions = function() {
 
 	// check asteroid & ship collisions
 	if (this.spaceship && this.spaceship.isActive) {
-		for (let i=0; i < this.asteroids.length; i++) {
-			let asteroid = this.asteroids[i];
-	
-			for (let j=0; j < this.spaceship.currPoints.length; j++) {
-				let givenPoint = this.spaceship.currPoints[j];
+		for (let i = 0; i < this.asteroids.length; i++) {
+			const asteroid = this.asteroids[i];
+
+			for (let j = 0; j < this.spaceship.currPoints.length; j++) {
+				const givenPoint = this.spaceship.currPoints[j];
 				if (asteroid.containsPoint(givenPoint)) {
-				
 					this.spaceship.onDestroy();
 					this.spaceship = null;
-	
+
 					this.makeSpaceship();
-					
+
 					// TODO: trigger a spaceship event of an explosion
 					return;
 				}
 			}
 		}
 	}
-	
 };
 
 Game.prototype.paintAllFrames = function paintFrame() {
@@ -204,10 +197,10 @@ Game.prototype.paintAllFrames = function paintFrame() {
 	});
 };
 
-Game.prototype.initMakeSpaceship = function initMakeSpaceship(){
+Game.prototype.initMakeSpaceship = function initMakeSpaceship() {
 	let timeout;
 
-	return function makeSpaceship(blnMakeNow = false){
+	return function makeSpaceship(blnMakeNow = false) {
 		// check if there are enough lives:
 		if (this.scoreboard.lives === 0) {
 			this.isActive = false;
@@ -216,15 +209,14 @@ Game.prototype.initMakeSpaceship = function initMakeSpaceship(){
 			// Can make spaceship
 			if (!timeout && !blnMakeNow) {
 				this.scoreboard.setLife('-1');
-				setTimeout(function(){
+				setTimeout(() => {
 					timeout = null;
 					this.spaceship = new Spaceship(this);
-				}.bind(this), 1000);
+				}, 1000);
 				return null;
-			} else {
-				this.scoreboard.setLife('-1');
-				return new Spaceship(this);
 			}
+			this.scoreboard.setLife('-1');
+			return new Spaceship(this);
 		}
 	};
 };
@@ -233,7 +225,7 @@ Game.prototype.initMakeSpaceship = function initMakeSpaceship(){
 Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 	let timerRef = null;
 	let canMakeAsteroid = true;
-	
+
 	// Save the Game Obj as a static property on the Asteroid class
 	Asteroid.gameRef = this;
 
@@ -245,7 +237,7 @@ Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 				this.asteroids.push(new Asteroid());
 				canMakeAsteroid = false;
 			} else if (timerRef === null) {
-				timerRef = setTimeout(function() {
+				timerRef = setTimeout(() => {
 					console.log('resetting timeout');
 					timerRef = null;
 					canMakeAsteroid = true;
@@ -258,53 +250,53 @@ Game.prototype.initMakeAsteroid = function initMakeAsteroid() {
 Game.prototype.fireBullet = function fireBullet() {
 	if (this.isFiring) {
 		if (this.canFire) {
-			var origin = this.spaceship.currPoints[0];
-			var offSet = this.spaceship.offSet;
+			const origin = this.spaceship.currPoints[0];
+			const offSet = this.spaceship.offSet;
 			this.bullets.push(new Bullet(this, origin, offSet));
 			this.canFire = false;
-			setTimeout(function(){
+			setTimeout(() => {
 				this.canFire = true;
-			}.bind(this), defaultGameOpts.firingDelay);
-		} 
+			}, defaultGameOpts.firingDelay);
+		}
 	}
 };
 
 // ================= Game related events ================
 Game.prototype.emitEvent = function(event) {
 	switch (event) {
-	case 'throttle-on':
-		this.spaceship.throttleOn();
-		break;
-	case 'throttle-off':
-		this.spaceship.throttleOff();
-		break;
-	case 'right-on':
-		this.spaceship.turnRight = true;
-		break;
-	case 'right-off':
-		this.spaceship.turnRight = false;
-		break;
-	case 'left-on':
-		this.spaceship.turnLeft = true;
-		break;
-	case 'left-off':
-		this.spaceship.turnLeft = false;
-		break;
-	case 'fire-on':
-		this.isFiring = true;
-		break;
-	case 'fire-off':
-		this.isFiring = false;
-		console.log('stop firing');
-		break;
-	case 'toggle-pause':
-		this.isActive = !this.isActive;
-		if (this.isActive) {
-			this.loop();
-		}
-		break;
-	default:
-		console.warn(`Could not process ${event}`);
+		case 'throttle-on':
+			this.spaceship.throttleOn();
+			break;
+		case 'throttle-off':
+			this.spaceship.throttleOff();
+			break;
+		case 'right-on':
+			this.spaceship.turnRight = true;
+			break;
+		case 'right-off':
+			this.spaceship.turnRight = false;
+			break;
+		case 'left-on':
+			this.spaceship.turnLeft = true;
+			break;
+		case 'left-off':
+			this.spaceship.turnLeft = false;
+			break;
+		case 'fire-on':
+			this.isFiring = true;
+			break;
+		case 'fire-off':
+			this.isFiring = false;
+			console.log('stop firing');
+			break;
+		case 'toggle-pause':
+			this.isActive = !this.isActive;
+			if (this.isActive) {
+				this.loop();
+			}
+			break;
+		default:
+			console.warn(`Could not process ${event}`);
 	}
 };
 

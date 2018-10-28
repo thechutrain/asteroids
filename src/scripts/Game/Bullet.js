@@ -52,8 +52,11 @@ Bullet.prototype.drawPoints = function drawPoints() {
 };
 
 Bullet.prototype.getBounds = function getBounds() {
-	let points = this.currPoints || [this.origin];
-	let leftBound, rightBound, upperBound, lowerBound;
+	const points = this.currPoints || [this.origin];
+	let leftBound;
+	let rightBound;
+	let upperBound;
+	let lowerBound;
 
 	points.forEach((pt, i) => {
 		if (i === 0) {
@@ -67,7 +70,12 @@ Bullet.prototype.getBounds = function getBounds() {
 		}
 	});
 
-	return { leftBound, rightBound, upperBound, lowerBound };
+	return {
+		leftBound,
+		rightBound,
+		upperBound,
+		lowerBound
+	};
 };
 
 module.exports = Bullet;

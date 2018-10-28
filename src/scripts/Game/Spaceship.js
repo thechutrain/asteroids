@@ -1,10 +1,8 @@
-'use strict';
-
 const defaultOpts = {
 	spacer: 0,
 	maxSpeed: 9,
 	minThrust: 3,
-	rotationSpeed: 8,
+	rotationSpeed: 8
 };
 
 function Spaceship(gameRef, options) {
@@ -13,7 +11,10 @@ function Spaceship(gameRef, options) {
 	this.options = defaultOpts || {} || options;
 
 	// Position, Orientation, Sizing of Ship:
-	this.origin = { x: this.canvasElem.width / 2, y: this.canvasElem.height / 2 };
+	this.origin = {
+		x: this.canvasElem.width / 2,
+		y: this.canvasElem.height / 2
+	};
 	this.offSet = 0; // degrees offset from pointing 12 oclock
 	this.r = 25;
 	this.prevPoints = [];
@@ -50,24 +51,33 @@ Spaceship.prototype.calcPoints = function() {
 	// Determine 3 points of triangle here:
 	const h = 2 * this.r * Math.cos((Math.PI * 30) / 180);
 
-	let angle1 = this.offSet;
-	let x1 = this.origin.x - (Math.sin((Math.PI * angle1) / 180) * h) / 2;
-	let y1 = this.origin.y - (Math.cos((Math.PI * angle1) / 180) * h) / 2;
+	const angle1 = this.offSet;
+	const x1 = this.origin.x - (Math.sin((Math.PI * angle1) / 180) * h) / 2;
+	const y1 = this.origin.y - (Math.cos((Math.PI * angle1) / 180) * h) / 2;
 
-	let angle2 = this.offSet + 60;
-	let x2 = this.origin.x + (Math.sin((Math.PI * angle2) / 180) * h) / 2;
-	let y2 = this.origin.y + (Math.cos((Math.PI * angle2) / 180) * h) / 2;
+	const angle2 = this.offSet + 60;
+	const x2 = this.origin.x + (Math.sin((Math.PI * angle2) / 180) * h) / 2;
+	const y2 = this.origin.y + (Math.cos((Math.PI * angle2) / 180) * h) / 2;
 
-	let angle3 = this.offSet - 60;
-	let x3 = this.origin.x + (Math.sin((Math.PI * angle3) / 180) * h) / 2;
-	let y3 = this.origin.y + (Math.cos((Math.PI * angle3) / 180) * h) / 2;
+	const angle3 = this.offSet - 60;
+	const x3 = this.origin.x + (Math.sin((Math.PI * angle3) / 180) * h) / 2;
+	const y3 = this.origin.y + (Math.cos((Math.PI * angle3) / 180) * h) / 2;
 
 	// Add three points in:
 	this.prevPoints = this.currPoints;
 	this.currPoints = [];
-	this.currPoints.push({ x: x1, y: y1 });
-	this.currPoints.push({ x: x2, y: y2 });
-	this.currPoints.push({ x: x3, y: y3 });
+	this.currPoints.push({
+		x: x1,
+		y: y1
+	});
+	this.currPoints.push({
+		x: x2,
+		y: y2
+	});
+	this.currPoints.push({
+		x: x3,
+		y: y3
+	});
 
 	if (!this.onScreen && this.isVisible()) {
 		this.onScreen = true;
@@ -148,8 +158,8 @@ Spaceship.prototype.reframe = function() {
 	this.origin.y = this.origin.y + adjustYBy;
 
 	this.currPoints.forEach(pt => {
-		pt.x = pt.x + adjustXBy;
-		pt.y = pt.y + adjustYBy;
+		pt.x += adjustXBy;
+		pt.y += adjustYBy;
 	});
 };
 
@@ -164,13 +174,13 @@ Spaceship.prototype.onDestroy = function() {
  * isHidden() : returns true if the entire shape is hidden
  * getBounds() : returns { leftBound, rightBound, upperBound, lowerBound}
  */
-//#region utility functions
+// #region utility functions
 Spaceship.prototype.isVisible = function() {
 	const xLimit = this.canvasElem.width;
 	const yLimit = this.canvasElem.height;
 
 	return this.currPoints.every(pt => {
-		let { x, y } = pt;
+		const { x, y } = pt;
 		return x >= 0 && x <= xLimit && y >= 0 && y <= yLimit;
 	});
 };
@@ -180,17 +190,20 @@ Spaceship.prototype.isHidden = function() {
 	const yLimit = this.canvasElem.height;
 
 	return this.currPoints.every(pt => {
-		let { x, y } = pt;
+		const { x, y } = pt;
 		return x < 0 || x > xLimit || y < 0 || y > yLimit;
 	});
 };
 
 Spaceship.prototype.getBounds = function() {
-	let leftBound, rightBound, upperBound, lowerBound;
+	let leftBound;
+	let rightBound;
+	let upperBound;
+	let lowerBound;
 	this.currPoints.forEach((pt, i) => {
-		let { x, y } = pt;
+		const { x, y } = pt;
 		if (i === 0) {
-			//Sets default values
+			// Sets default values
 			leftBound = rightBound = x;
 			upperBound = lowerBound = y;
 		} else {
@@ -201,9 +214,14 @@ Spaceship.prototype.getBounds = function() {
 		}
 	});
 
-	return { leftBound, rightBound, upperBound, lowerBound };
+	return {
+		leftBound,
+		rightBound,
+		upperBound,
+		lowerBound
+	};
 };
-//#endregion utility functions
+// #endregion utility functions
 
 /** ======== Speed related functions ========
  *
@@ -211,7 +229,7 @@ Spaceship.prototype.getBounds = function() {
  * throttleOn() : turns thrusters on (continues until explicitly turned off)
  * throttleOff() : explicitly turns thursters off
  */
-//#region speed related functions
+// #region speed related functions
 Spaceship.prototype.checkSpeed = function() {
 	if (this.thrusters) {
 		if (this.velocity < this.options.minThrust) {
@@ -245,18 +263,15 @@ Spaceship.prototype.throttleOff = function() {
 
 	clearInterval(this.throttleTimer);
 
-	this.throttleTimer = setInterval(
-		function() {
-			this.velocity = this.velocity * 0.75;
+	this.throttleTimer = setInterval(() => {
+		this.velocity = this.velocity * 0.75;
 
-			if (this.velocity < 1) {
-				this.velocity = 0;
-				clearInterval(this.throttleTimer);
-			}
-		}.bind(this),
-		300
-	);
+		if (this.velocity < 1) {
+			this.velocity = 0;
+			clearInterval(this.throttleTimer);
+		}
+	}, 300);
 };
-//#endregion speed related functionality
+// #endregion speed related functionality
 
 module.exports = Spaceship;

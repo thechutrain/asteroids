@@ -8,8 +8,11 @@ module.exports = exports = function polyfills() {
 			Element.prototype.oMatchesSelector ||
 			Element.prototype.webkitMatchesSelector ||
 			function(s) {
-				var matches = (this.document || this.ownerDocument).querySelectorAll(s),
-					i = matches.length;
+				const matches = (this.document || this.ownerDocument).querySelectorAll(
+					s
+				);
+
+				let i = matches.length;
 				while (--i >= 0 && matches.item(i) !== this) {}
 				return i > -1;
 			};
@@ -165,5 +168,5 @@ module.exports = exports = function polyfills() {
 	// 		return A;
 	// 	};
 	// }
-	//#endregion map
+	// #endregion map
 };
