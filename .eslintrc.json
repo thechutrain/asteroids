@@ -1,19 +1,7 @@
 {
-	"env": {
-		"node": true,
-		"es6": true,
-		"browser": true
-	},
-	"extends": "eslint:recommended",
-	"parserOptions": {
-		"ecmaVersion": 6
-	},
+	"extends": ["airbnb", "prettier"],
+	"plugins": ["prettier"],
 	"rules": {
-		"indent": ["error", "tab"],
-		"linebreak-style": ["error", "unix"],
-		"quotes": ["error", "single"],
-		"semi": ["error", "always"],
-		"no-console": "off",
-		"no-debugger": 0
+		"prettier/prettier": ["error"]		
 	}
 }
