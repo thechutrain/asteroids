@@ -8,9 +8,9 @@
 // };
 
 describe('test', () => {
-	it('should pass', ()=> {
+	it('should pass', () => {
 		expect('a').toBe('a');
-	})
+	});
 
 	// it('should have a random speed', () => {
 	// 	const a = new Asteroid({ canvasElem: fakeCanvasElem, ctx: null });
