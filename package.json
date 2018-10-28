@@ -5,13 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev": "gulp dev",
+    "dev": "parcel src/index.html",
     "build": "parcel build src/**.html",
     "publish": "npm run build && surge ./dist asteroid-ship.surge.sh",
-    "start": "parcel src/index.html",
-    "format": "npx prettier --write \"src/**\"",
-    "lint": "npx eslint \"src/**/*.{js,ts}\" --quiet",
-    "lint:fix": "npx eslint \"src/**/*.{js,ts}\" --quiet --fix"
+    "format": "prettier --write \"src/**\"",
+    "lint": "eslint \"src/**/*.{js,ts}\" --quiet",
+    "lint:fix": "eslint \"src/**/*.{js,ts}\" --quiet --fix"
   },
   "keywords": [
     "asteroids",
@@ -22,6 +21,7 @@
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
+    "babel-core": "^6.26.3",
     "eslint": "^5.8.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^3.1.0",
@@ -29,6 +29,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^7.11.1",
+    "husky": "^1.1.2",
     "jest": "^23.6.0",
     "parcel-bundler": "^1.10.3",
     "prettier": "^1.14.3",
