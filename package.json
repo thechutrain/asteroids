@@ -19,31 +19,7 @@
 	"license": "ISC",
 	"dependencies": {},
 	"devDependencies": {
-		"@babel/core": "^7.1.0",
-		"@babel/preset-env": "^7.0.0",
-		"autoprefixer": "^7.2.5",
-		"babel-core": "^7.0.0-bridge.0",
-		"babel-jest": "^23.6.0",
-		"browser-sync": "^2.24.7",
-		"browserify": "^16.2.2",
-		"cssnano": "^4.1.0",
-		"del": "^3.0.0",
-		"gulp": "^4.0.0",
-		"gulp-babel": "^8.0.0",
-		"gulp-htmlmin": "^4.0.0",
-		"gulp-if": "^2.0.2",
-		"gulp-imagemin": "^4.1.0",
-		"gulp-inject": "^4.3.2",
-		"gulp-postcss": "^7.0.1",
-		"gulp-sass": "^3.1.0",
-		"gulp-sourcemaps": "^1.12.1",
-		"gulp-uglify": "^3.0.1",
 		"jest": "^23.6.0",
-		"parcel-bundler": "^1.10.3",
-		"regenerator-runtime": "^0.12.1",
-		"stream-series": "^0.1.1",
-		"vinyl-buffer": "^1.0.1",
-		"vinyl-source-stream": "^2.0.0",
-		"watchify": "^3.11.0"
+		"parcel-bundler": "^1.10.3"
 	}
 }
