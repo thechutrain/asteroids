@@ -17,6 +17,11 @@
     "canvas",
     "javascript"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test"
+    }
+  },
   "author": "Alan Chu",
   "license": "ISC",
   "dependencies": {},
