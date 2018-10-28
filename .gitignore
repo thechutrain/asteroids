@@ -15,4 +15,4 @@ yarn-error.log
 #misc
 .notes/**
 .temp
-src/assets/sass/vendors/bootstrap/
+.cache
