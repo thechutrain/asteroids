@@ -6,9 +6,8 @@
 	"scripts": {
 		"test": "jest",
 		"dev": "gulp dev",
-		"build": "gulp build",
-		"publish:surge": "gulp build && surge ./dist asteroid-ship.surge.sh",
-		"publish:gh": "",
+		"build": "parcel build src/**.html",
+		"publish": "npm run build && surge ./dist asteroid-ship.surge.sh",
 		"start": "parcel src/index.html"
 	},
 	"keywords": [
