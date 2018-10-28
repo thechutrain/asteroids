@@ -1,4 +1,5 @@
-function Bullet(gameRef, origin, offSet) {
+function Bullet(gameRef, origin, offSet){
+	let x;
 	this.canvasElem = gameRef.canvasElem;
 	this.ctx = gameRef.ctx;
 	this.offSet = offSet;
